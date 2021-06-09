@@ -17,9 +17,6 @@ const VideoSchema = new Schema( {
     short_description: {
         type : String
     },
-    legal_information: {
-        type : String, required : true
-    },
     duration: Number,
     adding_date: {
         type: Date, 

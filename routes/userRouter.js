@@ -17,7 +17,7 @@ userRouter.get('/users', (req, res) => {
         .populate('favorites', 'artist title video_url')
         .populate({
             path: 'playlists',
-            populate: { path: 'video_list' }
+            populate: { path: 'video_list', select: 'artist title video_url' }
         }).sort({ body: 1 })
         .then(user => res.json(user))
         .catch(err => res.json(err))
