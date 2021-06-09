@@ -5,10 +5,10 @@ delete mongoose.connection.models['Playlist'];
 
 const PlaylistSchema = new Schema({
     name: { type: String, required: true },
-    video_list: {
+    video_list: [{
         type: Schema.Types.ObjectId,
         ref: 'Video' 
-    }  
+    }]
 })
 
 const Playlist = mongoose.model.Playlist || mongoose.model('Playlist', PlaylistSchema)  

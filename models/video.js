@@ -1,9 +1,6 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
-/* const uniqueValidator = require('mongoose-unique-validator'); */
-/* const {UserSchema} */
-
-// const User = require('./User')
+const uniqueValidator = require('mongoose-unique-validator');
 
 delete mongoose.connection.models['Video'];
 
@@ -15,7 +12,7 @@ const VideoSchema = new Schema( {
         type : String, required : true
     },
     video_url: {
-        type : String, required : true
+        type : String, required : true, unique : true
     },
     short_description: {
         type : String
@@ -37,7 +34,7 @@ const VideoSchema = new Schema( {
     
 })
 
-/* VideoSchema.plugin(uniqueValidator); */
+VideoSchema.plugin(uniqueValidator);
 
 const Video = mongoose.model.Video || mongoose.model('Video', VideoSchema)
 
