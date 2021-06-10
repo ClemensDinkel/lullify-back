@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 3001;
 const userRouter = require('./routes/userRouter')
 const videoRouter = require('./routes/videoRouter')
 const playlistRouter = require('./routes/playlistRouter')
+const authRouter = require('./routes/authRouter')
 
 require('dotenv').config();
 app.use(express.urlencoded ({extended: false}));
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 app.use(userRouter)
 app.use(videoRouter)
 app.use(playlistRouter)
+app.use(authRouter)
 
 
 app.listen(PORT, console.log(`Running on ${PORT}`))

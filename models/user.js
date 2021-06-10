@@ -40,9 +40,10 @@ const UserSchema = new Schema({
         default: Date.now() 
     },
     phone: String,
-    citycode: String,
-    cityname: String,
+    city_code: String,
+    city_name: String,
     country: String,
+    company: String,
     favorites: [{
         type: Schema.Types.ObjectId,
         ref: 'Video' 
