@@ -3,7 +3,7 @@ const { Video } = require('../models/video')
 const videoRouter = Router();
 
 videoRouter.get('/videos', (req, res) => {
-    Video.find().populate('uploader', "_id first_name last_name")
+    Video.find().populate('uploader', "_id user_name")
         .then(video => res.json(video))
         .catch(err => res.json(err))
 })

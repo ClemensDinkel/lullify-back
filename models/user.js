@@ -6,12 +6,39 @@ delete mongoose.connection.models['User'];
 
 //define Schema
 const UserSchema = new Schema({
-    first_name: { type: String, required: true },
-    last_name: { type: String, required: true },
-    role: { type: String, default: "user" },
-    email: { type: String, required: true, unique: true, min: 6 },
-    password: { type: String, required: true, min: 6, max: 32 },
-    reg_date: { type: Date, default: Date.now() },
+    first_name: { 
+        type: String, 
+        required: true 
+    },
+    last_name: { 
+        type: String, 
+        required: true 
+    },
+    user_name: { 
+        type: String, 
+        required: true, 
+        unique: true
+    },
+    role: { 
+        type: String, 
+        default: "user" 
+    },
+    email: { 
+        type: String, 
+        required: true, 
+        unique: true, 
+        min: 6 
+    },
+    password: { 
+        type: String, 
+        required: true, 
+        min: 6, 
+        max: 32 
+    },
+    reg_date: { 
+        type: Date, 
+        default: Date.now() 
+    },
     phone: String,
     citycode: String,
     cityname: String,

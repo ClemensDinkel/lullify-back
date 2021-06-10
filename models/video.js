@@ -6,13 +6,17 @@ delete mongoose.connection.models['Video'];
 
 const VideoSchema = new Schema( {
     title: {
-        type : String, required : true
+        type : String, 
+        required : true
     },
     artist: {
-        type : String, required : true
+        type : String, 
+        required : true
     },
     video_url: {
-        type : String, required : true, unique : true
+        type : String, 
+        required : true, 
+        unique : true
     },
     short_description: {
         type : String
@@ -26,9 +30,12 @@ const VideoSchema = new Schema( {
         type: Schema.Types.ObjectId,
         ref: 'User' // or 'UserSchema
     },
+    reports : {
+        type: Number,
+        default: 0
+    },
     languages: [String],
     tags: [String]
-    
 })
 
 VideoSchema.plugin(uniqueValidator);

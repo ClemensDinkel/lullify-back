@@ -38,7 +38,7 @@ userRouter.get('/users/:id', (req, res) => {
         .catch(() => res.json('User does not exist'))
 })
 
-userRouter.post('/users', (req, res) => {
+userRouter.post('/register', (req, res) => {
     User.create(req.body)
         .then(user => res.json(user))
         .catch(err => res.json(err))

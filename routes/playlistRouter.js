@@ -4,7 +4,10 @@ const playlistRouter = Router();
 
  
 playlistRouter.get('/playlists', (req, res) => {
-    Playlist.find().populate('video_list', 'artist title video_url')
+    Playlist
+        .find()
+        .populate('video_list', 'artist title video_url')
+        .populate('user_id', 'user_name')
         .then(playlist => res.json(playlist))
         .catch(err => res.json(err))
 }) 
