@@ -5,6 +5,8 @@ const authRouter = Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
+
+// available to everyone
 authRouter.post('/register', async (req, res) => {
     if (!req.body.password) return res.send('No password provided')
 
@@ -45,6 +47,7 @@ authRouter.post('/register', async (req, res) => {
     }
 })
 
+// available to everyone
 authRouter.post('/login', async (req, res) => {
     const user = await User.findOne({email : req.body.email} /* || {user_name : req.body.user_login} */)
     if (!user) return res.status(400).send('User not found')

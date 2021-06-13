@@ -68,7 +68,7 @@ userRouter.put('/users/:id/promote', (req, res) => {
 userRouter.put('/users/:id/demote', (req, res) => {
     const { id } = req.params
     User.findOneAndUpdate(({ _id: id, role: "content_creator"}), {role: "user"})
-    .then((user) => res.json(user === null ? "Content_creator can't be demoted" : 'Content_creator has been demoted to user'))
+    .then((user) => res.json(user === null ? "User can't be demoted" : 'Content_creator has been demoted to user'))
         .catch(err => res.json(err))
 })
 
