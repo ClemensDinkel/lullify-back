@@ -26,7 +26,7 @@ const VideoSchema = new Schema( {
         type: Date, 
         default : Date.now()
     },
-    uploader: {
+    uploader_id: {
         type: Schema.Types.ObjectId,
         ref: 'User' // or 'UserSchema
     },

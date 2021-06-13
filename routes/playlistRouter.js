@@ -2,9 +2,18 @@ const { Router } = require('express');
 const { Playlist } = require('../models/playlist')
 const playlistRouter = Router();
 
-
+// available only to admin
 playlistRouter.get('/playlists', (req, res) => {
     Playlist.find()
+        .populate('video_list', 'artist title video_url')
+        .populate('user_id', 'user_name')
+        .then(playlist => res.json(playlist))
+        .catch(err => res.json(err))
+})
+
+// available to the user with the user_id
+playlistRouter.get('/playlists/:user_id', (req, res) => {
+    Playlist.find({user_id: req.params.user_id})
         .populate('video_list', 'artist title video_url')
         .populate('user_id', 'user_name')
         .then(playlist => res.json(playlist))

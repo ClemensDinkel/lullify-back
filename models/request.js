@@ -7,6 +7,10 @@ const RequestSchema = new Schema({
     user_id: {
         type: Schema.Types.ObjectId,
         ref: 'User'
+    },
+    req_date: { 
+        type: Date, 
+        default: Date.now() 
     }
 })
 

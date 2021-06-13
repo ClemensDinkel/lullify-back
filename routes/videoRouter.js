@@ -4,15 +4,15 @@ const videoRouter = Router();
 
 videoRouter.get('/videos', (req, res) => {
     Video.find()
-        .populate('uploader', "_id user_name")
+        .populate('uploader_id', "_id user_name")
         .then(video => res.json(video))
         .catch(err => res.json(err))
 })
 
 videoRouter.get('/videos/byUploader/:uploader', (req, res) => {
     const { uploader } = req.params
-    Video.find({ uploader: uploader })
-        .populate('uploader', "_id user_name")
+    Video.find({ uploader_id: uploader })
+        .populate('uploader_id', "_id user_name")
         .then(video => res.json(video))
         .catch(err => res.json(err))
 })
@@ -20,7 +20,7 @@ videoRouter.get('/videos/byUploader/:uploader', (req, res) => {
 videoRouter.get('/videos/:id', (req, res) => {
     const { id } = req.params
     Video.find({ _id: id })
-        .populate('uploader', "_id user_name")
+        .populate('uploader_id', "_id user_name")
         .then(video => res.json(video))
         .catch(err => res.json(err))
 })
