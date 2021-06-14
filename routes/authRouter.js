@@ -7,6 +7,8 @@ const jwt = require('jsonwebtoken')
 
 authRouter.post('/register', async (req, res) => {
     if (!req.body.password) return res.send('No password provided')
+    const checkEmail = await User.findOne({email: req.body.email})
+    if(checkEmail) return res.status(400).send('Email already exist')
 
     const salt = await bcrypt.genSalt(10)
     const hashPassword = await bcrypt.hash(req.body.password, salt)
@@ -27,6 +29,10 @@ authRouter.post('/register', async (req, res) => {
     const request = new Request({
         user_id: user._id
     })
+
+    console.log(user)
+    console.log(request)
+    console.log(requested_to_be_cc)
 
     user.save()
         .then(user => {

@@ -3,7 +3,6 @@ const { Playlist } = require('../models/playlist')
 const playlistRouter = Router();
 const verifyAdmin = require('./verifyAdmin')
 const verifyUser = require('./verifyUser')
-const verifySpecificUser = require('./verifySpecificUser')
 
 playlistRouter.get('/playlists', verifyAdmin, (req, res) => {
     Playlist.find()

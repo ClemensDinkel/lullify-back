@@ -68,6 +68,13 @@ userRouter.put('/users/:user_id/demote', verifyAdmin, (req, res) => {
         .catch(err => res.json(err))
 })
 
+userRouter.get('/users/:user_id/playlists/:playlist_id', verifySpecificUser, (req, res) => {
+    const {playlist_id} = req.params
+    Playlist.findOne({ _id: playlist_id }, req.body)
+        .then(playlist => res.json(playlist))
+        .catch(err => res.json(err))
+})
+
 userRouter.put('/users/:user_id/playlists/:playlist_id', verifySpecificUser, (req, res) => {
     const {playlist_id} = req.params
     Playlist.findOneAndUpdate({ _id: playlist_id }, req.body)
@@ -82,7 +89,6 @@ userRouter.delete('/users/:user_id', verifySpecificUser, (req, res) => {
         .catch(err => res.json(err))
 })
 
-
 userRouter.delete('/users/:user_id/playlists/:playlist_id', verifySpecificUser, (req, res) => {
     const { playlist_id } = req.params
     Playlist.findOneAndDelete({ _id: playlist_id })
@@ -90,8 +96,7 @@ userRouter.delete('/users/:user_id/playlists/:playlist_id', verifySpecificUser, 
         .catch(err => res.json(err))
 })
 
-
-userRouter.put('users/:user_id/videos/:video_id', verifyCC, verifySpecificUser, (req, res) => {
+userRouter.put('/users/:user_id/videos/:video_id', verifyCC, verifySpecificUser, (req, res) => {
     const { video_id } = req.params
     Video.findOneAndUpdate({ _id: video_id }, req.body)
         .then(video => res.json(video))

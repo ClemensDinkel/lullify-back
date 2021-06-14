@@ -28,7 +28,8 @@ const VideoSchema = new Schema( {
     },
     uploader_id: {
         type: Schema.Types.ObjectId,
-        ref: 'User' // or 'UserSchema
+        ref: 'User', // or 'UserSchema
+        required: true
     },
     reports : {
         type: Number,
