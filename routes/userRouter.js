@@ -2,10 +2,12 @@ const { Router } = require('express');
 const { User } = require('../models/user')
 const { Playlist } = require('../models/playlist')
 const { Video } = require('../models/video')
-const verifyToken = require('./verifyToken')
+const verifyAdmin = require('./verifyAdmin') 
+const verifySpecificUser = require('./verifySpecificUser') 
+const verifyCC = require('./verifyCC')
 const userRouter = Router();
 
-userRouter.get('/users', verifyToken, (req, res) => {
+userRouter.get('/users', verifyAdmin, (req, res) => {
     User.find()
         .populate('favorites', 'artist title video_url')
         .populate({
@@ -16,9 +18,9 @@ userRouter.get('/users', verifyToken, (req, res) => {
         .catch(err => res.json(err))
 })
 
-userRouter.get('/users/:id', (req, res) => {
-    const { id } = req.params
-    User.find({ _id: id })
+userRouter.get('/users/:user_id', verifySpecificUser, (req, res) => {
+    const { user_id } = req.params
+    User.find({ _id: user_id })
         .populate('favorites', 'artist title video_url')
         .populate({
             path: 'playlists',
@@ -28,54 +30,78 @@ userRouter.get('/users/:id', (req, res) => {
         .catch(() => res.json('User does not exist'))
 })
 
-/* userRouter.post('/register', (req, res) => {
-    User.create(req.body)
-        .then(user => res.json(user))
-        .catch(err => res.json(err))
-}) ---now in authRouter ---*/
-
-userRouter.get('/users/:id/playlists', (req, res) => {
-    const { id } = req.params
-    Playlist.find({ user_id: id })
+userRouter.get('/users/:user_id/playlists', verifySpecificUser, (req, res) => {
+    const { user_id } = req.params
+    Playlist.find({ user_id: user_id })
         .populate('video_list', 'artist title video_url')
         .populate('user_id', 'user_name')
         .then(playlist => res.json(playlist))
         .catch(err => res.json(err))
 })
 
-userRouter.get('/users/:id/videos', (req, res) => {
-    const { id } = req.params
-    Video.find({ uploader_id: id })
+userRouter.get('/users/:user_id/videos', verifySpecificUser, (req, res) => {
+    const { user_id } = req.params
+    Video.find({ uploader_id: user_id })
         .populate('uploader_id', "_id user_name")
         .then(video => res.json(video))
         .catch(err => res.json(err))
 })
 
-userRouter.put('/users/:id', (req, res) => {
-    const { id } = req.params
-    User.findOneAndUpdate({ _id: id }, req.body)
+userRouter.put('/users/:user_id', verifySpecificUser, (req, res) => {
+    const { user_id } = req.params
+    User.findOneAndUpdate({ _id: user_id }, req.body)
         .then(user => res.json(user))
         .catch(err => res.json(err))
 })
 
-userRouter.put('/users/:id/promote', (req, res) => {
-    const { id } = req.params
-    User.findOneAndUpdate(({ _id: id, role: "user"}), {role:"content_creator"})
+userRouter.put('/users/:user_id/promote', verifyAdmin, (req, res) => {
+    const { user_id } = req.params
+    User.findOneAndUpdate(({ _id: user_id, role: "user"}), {role:"content_creator"})
         .then((user) => res.json(user === null ? "User can't be promoted" : 'User has been promoted to content_creator'))
         .catch(err => res.json(err))
 })
 
-userRouter.put('/users/:id/demote', (req, res) => {
-    const { id } = req.params
-    User.findOneAndUpdate(({ _id: id, role: "content_creator"}), {role: "user"})
+userRouter.put('/users/:user_id/demote', verifyAdmin, (req, res) => {
+    const { user_id } = req.params
+    User.findOneAndUpdate(({ _id: user_id, role: "content_creator"}), {role: "user"})
     .then((user) => res.json(user === null ? "User can't be demoted" : 'Content_creator has been demoted to user'))
         .catch(err => res.json(err))
 })
 
-userRouter.delete('/users/:id', (req, res) => {
-    const { id } = req.params
-    User.deleteOne({ _id: id })
+userRouter.put('/users/:user_id/playlists/:playlist_id', verifySpecificUser, (req, res) => {
+    const {playlist_id} = req.params
+    Playlist.findOneAndUpdate({ _id: playlist_id }, req.body)
+        .then(playlist => res.json(playlist))
+        .catch(err => res.json(err))
+})
+
+userRouter.delete('/users/:user_id', verifySpecificUser, (req, res) => {
+    const { user_id } = req.params
+    User.deleteOne({ _id: user_id })
         .then(() => res.json('User has been deleted successfully'))
+        .catch(err => res.json(err))
+})
+
+
+userRouter.delete('/users/:user_id/playlists/:playlist_id', verifySpecificUser, (req, res) => {
+    const { playlist_id } = req.params
+    Playlist.findOneAndDelete({ _id: playlist_id })
+        .then(res.json('Playlist has been deleted successfully'))
+        .catch(err => res.json(err))
+})
+
+
+userRouter.put('users/:user_id/videos/:video_id', verifyCC, verifySpecificUser, (req, res) => {
+    const { video_id } = req.params
+    Video.findOneAndUpdate({ _id: video_id }, req.body)
+        .then(video => res.json(video))
+        .catch(err => res.json(err))
+})
+
+userRouter.delete('/users/:user_id/videos/:video_id', verifyCC, verifySpecificUser, (req, res) => {
+    const { video_id } = req.params
+    Video.deleteOne({ _id: video_id })
+        .then(() => res.json('Video has been deleted successfully'))
         .catch(err => res.json(err))
 })
 
