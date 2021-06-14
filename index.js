@@ -7,16 +7,16 @@ const videoRouter = require('./routes/videoRouter')
 const playlistRouter = require('./routes/playlistRouter')
 const authRouter = require('./routes/authRouter')
 const requestRouter = require('./routes/requestRouter')
+const cors = require('cors')
 
 require('dotenv').config();
 app.use(express.urlencoded ({extended: false}));
-
+app.use(cors())
 mongoose.connect(process.env.MONGO_DB, {useNewUrlParser : true, useUnifiedTopology : true});
 
 app.get('/', (req, res) => {
     res.send('Welcome')
 })
-
 
 app.use(userRouter)
 app.use(videoRouter)
