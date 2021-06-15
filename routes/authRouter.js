@@ -99,6 +99,7 @@ authRouter.post('/login', async (req, res) => {
     }
     const accessToken = generateAccessToken(userData)
     const refreshToken = generateRefreshToken(userData)
+    res.header('auth-token', {accessToken: accessToken, refreshToken: refreshToken})
     res.json({accessToken: accessToken, refreshToken: refreshToken})
     refreshTokens.push(refreshToken)
 })
