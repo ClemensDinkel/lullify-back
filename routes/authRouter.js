@@ -98,12 +98,12 @@ authRouter.post('/login', async (req, res) => {
         user_name: user.user_name,
         role: user.role
     }
-    const accessToken = generateAccessToken(userData)
+    const token = generateAccessToken(userData)
     const refreshToken = generateRefreshToken(userData)
     /* res.header('auth-token', {accessToken: accessToken, refreshToken: refreshToken})
     res.send({accessToken: accessToken, refreshToken: refreshToken}) */
-    res.header('auth-token', accessToken)
-    res.json(accessToken)
+    res.header('auth-token', token)
+    res.json(token)
     /* refreshTokens.push(refreshToken) */
 })
 
