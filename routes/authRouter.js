@@ -15,6 +15,8 @@ const generateRefreshToken = (user) => {
     return jwt.sign(user, process.env.REFRESH_SECRET)
 }
 
+authRouter.use(cors())
+
 authRouter.post('/refresh', (req, res) => {
     const refreshToken = req.header('refresh-token')
     if (refreshToken === null) return res.status(401).send("Access denied")
