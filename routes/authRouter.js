@@ -86,6 +86,7 @@ authRouter.post('/register', async (req, res) => {
 })
 
 authRouter.post('/login', async (req, res) => {
+    console.log("login")
     const user = await User.findOne({ email: req.body.email } /* || {user_name : req.body.user_login} */)
     if (!user) return res.status(400).send('User not found')
 
