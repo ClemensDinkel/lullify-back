@@ -5,10 +5,44 @@ const authRouter = Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
+//temporary workaround
+let refreshTokens = []
+
+const generateAccessToken = (user) => {
+    return jwt.sign(user, process.env.SECRET, { expiresIn: '20min' })
+}
+const generateRefreshToken = (user) => {
+    return jwt.sign(user, process.env.REFRESH_SECRET)
+}
+
+authRouter.post('/refresh', (req, res) => {
+    const refreshToken = req.header('refresh-token')
+    if (refreshToken === null) return res.status(401).send("Access denied")
+    if (!refreshTokens.includes(refreshToken)) return res.status(403).send("Token no longer valid")
+    jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, user) => {
+        if(err) return res.status(403).send("Token no longer valid")
+        console.log(user)
+        const accessToken = generateAccessToken({
+            id: user.id,
+            user_name: user.user_name,
+            role: user.role
+        })
+        res.json({accessToken: accessToken})
+    })
+})
+
+authRouter.delete('/logout', (req, res) => {
+    // temporary workaround
+    const tokenToDelete = req.header('refresh-token')
+    refreshTokens = refreshTokens.filter(token => token !== tokenToDelete)
+    
+    return res.status(204).send("Logout successful")
+})
+
 authRouter.post('/register', async (req, res) => {
     if (!req.body.password) return res.send('No password provided')
-    const checkEmail = await User.findOne({email: req.body.email})
-    if(checkEmail) return res.status(400).send('Email already exist')
+    const checkEmail = await User.findOne({ email: req.body.email })
+    if (checkEmail) return res.status(400).send('Email already exist')
 
     const salt = await bcrypt.genSalt(10)
     const hashPassword = await bcrypt.hash(req.body.password, salt)
@@ -43,29 +77,30 @@ authRouter.post('/register', async (req, res) => {
 
     if (requested_to_be_cc && request.user_id != null) {
         request.save()
-        .then(request => {
-            console.log("request created")
-            res.json(request)
-        })
-        .catch(err => res.json(err))
+            .then(request => {
+                console.log("request created")
+                res.json(request)
+            })
+            .catch(err => res.json(err))
     }
 })
 
 authRouter.post('/login', async (req, res) => {
-    const user = await User.findOne({email : req.body.email} /* || {user_name : req.body.user_login} */)
+    const user = await User.findOne({ email: req.body.email } /* || {user_name : req.body.user_login} */)
     if (!user) return res.status(400).send('User not found')
-    
+
     const comparePassword = await bcrypt.compare(req.body.password, user.password)
-    if(!comparePassword) return res.status(400).send('Wrong password')
+    if (!comparePassword) return res.status(400).send('Wrong password')
 
-    const token = jwt.sign({
+    const userData = {
         id: user._id,
-        user_name : user.user_name,
-        role : user.role 
-    } , process.env.SECRET)
-    res.header('auth-token', token)
-    res.json(token)
-
+        user_name: user.user_name,
+        role: user.role
+    }
+    const accessToken = generateAccessToken(userData)
+    const refreshToken = generateRefreshToken(userData)
+    res.json({accessToken: accessToken, refreshToken: refreshToken})
+    refreshTokens.push(refreshToken)
 })
 
 module.exports = authRouter

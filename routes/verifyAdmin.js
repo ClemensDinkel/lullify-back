@@ -2,9 +2,10 @@ const jwt = require('jsonwebtoken')
 
 const verifyAdmin = (req, res, next) => {
     const token = req.header('auth-token')
-    if (!token) return res.status(400).send('Access denied')
+    if (!token) return res.status(401).send('Access denied')
     const decToken = jwt.decode(token)
     //console.log("checking role...")
+    console.log(decToken)
     if (decToken.role !== "admin") return res.status(400).send('Access denied')
     try {
         const verified = jwt.verify(token, process.env.SECRET)
@@ -12,7 +13,7 @@ const verifyAdmin = (req, res, next) => {
         next()
     }
     catch (err) {
-        res.send('error')
+        res.status(403).send('Token no longer valid')
     }
 }
 
