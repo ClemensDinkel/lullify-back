@@ -4,6 +4,8 @@ const { Request } = require('../models/request')
 const authRouter = Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const cors = require('cors')
+authRouter.use(cors())
 
 //temporary workaround
 let refreshTokens = []
@@ -15,7 +17,7 @@ const generateRefreshToken = (user) => {
     return jwt.sign(user, process.env.REFRESH_SECRET)
 }
 
-authRouter.use(cors())
+
 
 authRouter.post('/refresh', (req, res) => {
     const refreshToken = req.header('refresh-token')
