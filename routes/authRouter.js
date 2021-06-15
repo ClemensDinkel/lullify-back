@@ -100,9 +100,11 @@ authRouter.post('/login', async (req, res) => {
     }
     const accessToken = generateAccessToken(userData)
     const refreshToken = generateRefreshToken(userData)
-    res.header('auth-token', {accessToken: accessToken, refreshToken: refreshToken})
-    res.send({accessToken: accessToken, refreshToken: refreshToken})
-    refreshTokens.push(refreshToken)
+    /* res.header('auth-token', {accessToken: accessToken, refreshToken: refreshToken})
+    res.send({accessToken: accessToken, refreshToken: refreshToken}) */
+    res.header('auth-token', accessToken)
+    res.json(accessToken)
+    /* refreshTokens.push(refreshToken) */
 })
 
 module.exports = authRouter
