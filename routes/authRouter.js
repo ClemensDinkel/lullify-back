@@ -11,13 +11,11 @@ authRouter.use(cors())
 let refreshTokens = []
 
 const generateAccessToken = (user) => {
-    return jwt.sign(user, process.env.SECRET, { expiresIn: '1min' })
+    return jwt.sign(user, process.env.SECRET, { expiresIn: '1440min' })
 }
 const generateRefreshToken = (user) => {
     return jwt.sign(user, process.env.REFRESH_SECRET)
 }
-
-
 
 authRouter.post('/refresh', (req, res) => {
     const refreshToken = req.header('refresh-token')
