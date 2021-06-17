@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { Video } = require('../models/video')
 const verifyCC = require("./verifyCC");
 const verifySpecificUser = require('./verifySpecificUser');
+const verifyUser = require('./verifyUser')
 const videoRouter = Router();
 
 videoRouter.get('/videos', (req, res) => {
@@ -29,6 +30,14 @@ videoRouter.get('/videos/:video_id', (req, res) => {
 
 videoRouter.post('/videos', verifyCC, (req, res) => {
     Video.create(req.body)
+        .then(video => res.json(video))
+        .catch(err => res.json(err))
+})
+
+videoRouter.put('/videos/:video_id/report', verifyUser, (req, res) => {
+    const { video_id } = req.params
+    const {user_id} = req.body
+    Video.findOneAndUpdate({_id: video_id && !repotedBy.includes(user_id)}, {reports: reports+=1})
         .then(video => res.json(video))
         .catch(err => res.json(err))
 })

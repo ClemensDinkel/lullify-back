@@ -40,6 +40,10 @@ const VideoSchema = new Schema( {
         type: Number,
         default: 0
     },
+    reportedBy : [{
+        type: Schema.Types.ObjectId,
+        ref: 'User' 
+    }],
     languages: [String],
     tags: [String]
 })
