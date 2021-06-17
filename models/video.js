@@ -18,6 +18,11 @@ const VideoSchema = new Schema( {
         required : true, 
         unique : true
     },
+    video_img_url: {
+        type: String,
+        required: true,
+        default: "https://i.stack.imgur.com/PtbGQ.png"
+    },
     short_description: {
         type : String
     },
