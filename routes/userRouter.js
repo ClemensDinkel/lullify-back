@@ -2,8 +2,8 @@ const { Router } = require('express');
 const { User } = require('../models/user')
 const { Playlist } = require('../models/playlist')
 const { Video } = require('../models/video')
-const verifyAdmin = require('./verifyAdmin') 
-const verifySpecificUser = require('./verifySpecificUser') 
+const verifyAdmin = require('./verifyAdmin')
+const verifySpecificUser = require('./verifySpecificUser')
 const verifyCC = require('./verifyCC')
 const userRouter = Router();
 const bcrypt = require('bcryptjs')
@@ -49,13 +49,21 @@ userRouter.get('/users/:user_id/videos', verifySpecificUser, (req, res) => {
         .catch(err => res.json(err))
 })
 
+// const comparePassword = await bcrypt.compare(req.body.password, user.password)
+//if (!comparePassword) return res.status(400).send('Wrong password')
+
+
 userRouter.put('/users/:user_id', verifySpecificUser, async (req, res) => {
     const { user_id } = req.params
+    let userToUpdate = User.findOne({ _id: user_id })
+    // not functional yet
+    /* const comparePassword = await bcrypt.compare(req.body.currentPassword, userToUpdate.password)
+    if (!comparePassword) return res.status(400).send('Wrong password') */
+    let user = req.body
     const salt = await bcrypt.genSalt(10)
-    const hashPassword = await bcrypt.hash(req.body.password, salt)
-    const user = req.body
+    const hashPassword = await bcrypt.hash(user.password, salt)
     user.password = hashPassword
-    console.log(user)
+    // maybe there is a better way without 
     User.findOneAndUpdate({ _id: user_id }, user)
         .then(user => res.json(user))
         .catch(err => res.json(err))
@@ -63,27 +71,27 @@ userRouter.put('/users/:user_id', verifySpecificUser, async (req, res) => {
 
 userRouter.put('/users/:user_id/promote', verifyAdmin, (req, res) => {
     const { user_id } = req.params
-    User.findOneAndUpdate(({ _id: user_id, role: "user"}), {role:"content_creator"})
+    User.findOneAndUpdate(({ _id: user_id, role: "user" }), { role: "content_creator" })
         .then((user) => res.json(user === null ? "User can't be promoted" : 'User has been promoted to content_creator'))
         .catch(err => res.json(err))
 })
 
 userRouter.put('/users/:user_id/demote', verifyAdmin, (req, res) => {
     const { user_id } = req.params
-    User.findOneAndUpdate(({ _id: user_id, role: "content_creator"}), {role: "user"})
-    .then((user) => res.json(user === null ? "User can't be demoted" : 'Content_creator has been demoted to user'))
+    User.findOneAndUpdate(({ _id: user_id, role: "content_creator" }), { role: "user" })
+        .then((user) => res.json(user === null ? "User can't be demoted" : 'Content_creator has been demoted to user'))
         .catch(err => res.json(err))
 })
 
 userRouter.get('/users/:user_id/playlists/:playlist_id', verifySpecificUser, (req, res) => {
-    const {playlist_id} = req.params
+    const { playlist_id } = req.params
     Playlist.findOne({ _id: playlist_id }, req.body)
         .then(playlist => res.json(playlist))
         .catch(err => res.json(err))
 })
 
 userRouter.put('/users/:user_id/playlists/:playlist_id', verifySpecificUser, (req, res) => {
-    const {playlist_id} = req.params
+    const { playlist_id } = req.params
     Playlist.findOneAndUpdate({ _id: playlist_id }, req.body)
         .then(playlist => res.json(playlist))
         .catch(err => res.json(err))
