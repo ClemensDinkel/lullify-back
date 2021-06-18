@@ -6,6 +6,8 @@ const verifyAdmin = require('./verifyAdmin')
 const verifySpecificUser = require('./verifySpecificUser') 
 const verifyCC = require('./verifyCC')
 const userRouter = Router();
+const bcrypt = require('bcryptjs')
+
 
 userRouter.get('/users', verifyAdmin, (req, res) => {
     User.find()
@@ -47,9 +49,14 @@ userRouter.get('/users/:user_id/videos', verifySpecificUser, (req, res) => {
         .catch(err => res.json(err))
 })
 
-userRouter.put('/users/:user_id', verifySpecificUser, (req, res) => {
+userRouter.put('/users/:user_id', verifySpecificUser, async (req, res) => {
     const { user_id } = req.params
-    User.findOneAndUpdate({ _id: user_id }, req.body)
+    const salt = await bcrypt.genSalt(10)
+    const hashPassword = await bcrypt.hash(req.body.password, salt)
+    const user = req.body
+    user.password = hashPassword
+    console.log(user)
+    User.findOneAndUpdate({ _id: user_id }, user)
         .then(user => res.json(user))
         .catch(err => res.json(err))
 })
