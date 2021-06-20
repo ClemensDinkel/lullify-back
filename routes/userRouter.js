@@ -55,15 +55,18 @@ userRouter.get('/users/:user_id/videos', verifySpecificUser, (req, res) => {
 
 userRouter.put('/users/:user_id', verifySpecificUser, async (req, res) => {
     const { user_id } = req.params
-    let userToUpdate = User.findOne({ _id: user_id })
-    // not functional yet
-    /* const comparePassword = await bcrypt.compare(req.body.currentPassword, userToUpdate.password)
-    if (!comparePassword) return res.status(400).send('Wrong password') */
+    let dbpw = ""
+    await User.findOne({ _id: user_id }).exec().then(res => {
+        console.log(res.password)
+        dbpw = res.password
+    })
+    const comparePassword = await bcrypt.compare(req.body.currentPassword, dbpw)
+    if (!comparePassword) return res.status(400).send('Wrong password')
     let user = req.body
     const salt = await bcrypt.genSalt(10)
     const hashPassword = await bcrypt.hash(user.password, salt)
     user.password = hashPassword
-    // maybe there is a better way without 
+    // maybe there is a better way without making a second call
     User.findOneAndUpdate({ _id: user_id }, user)
         .then(user => res.json(user))
         .catch(err => res.json(err))
