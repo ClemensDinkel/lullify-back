@@ -79,6 +79,13 @@ userRouter.put('/users/:user_id/promote', verifyAdmin, (req, res) => {
         .catch(err => res.json(err))
 })
 
+userRouter.put('/users/:user_id/makeAdmin', verifyAdmin, (req, res) => {
+    const { user_id } = req.params
+    User.findOneAndUpdate(({ _id: user_id}), { role: "admin" })
+        .then((user) => res.json(user === null ? "User can't be promoted" : 'User has been promoted to admin'))
+        .catch(err => res.json(err))
+})
+
 userRouter.put('/users/:user_id/demote', verifyAdmin, (req, res) => {
     const { user_id } = req.params
     User.findOneAndUpdate(({ _id: user_id, role: "content_creator" }), { role: "user" })
