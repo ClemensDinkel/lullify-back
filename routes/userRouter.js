@@ -63,9 +63,12 @@ userRouter.put('/users/:user_id', verifySpecificUser, async (req, res) => {
     const comparePassword = await bcrypt.compare(req.body.currentPassword, dbpw)
     if (!comparePassword) return res.status(400).send('Wrong password')
     let user = req.body
-    const salt = await bcrypt.genSalt(10)
-    const hashPassword = await bcrypt.hash(user.password, salt)
-    user.password = hashPassword
+    if (req.body.password !== "") {
+        const salt = await bcrypt.genSalt(10)
+        const hashPassword = await bcrypt.hash(user.password, salt)
+        user.password = hashPassword
+    }
+    else user.password = dbpw
     // maybe there is a better way without making a second call
     User.findOneAndUpdate({ _id: user_id }, user)
         .then(user => res.json(user))
