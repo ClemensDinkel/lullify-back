@@ -8,10 +8,13 @@ const playlistRouter = require('./routes/playlistRouter')
 const authRouter = require('./routes/authRouter')
 const requestRouter = require('./routes/requestRouter')
 const cors = require('cors')
-
+const corsOptions = {
+    origin: "http://localhost:3000",
+    credentials: true,
+}
 require('dotenv').config();
 app.use(express.urlencoded ({extended: false}));
-app.use(cors())
+app.use(cors(corsOptions))
 mongoose.connect(process.env.MONGO_DB, {useNewUrlParser : true, useUnifiedTopology : true});
 
 app.get('/', (req, res) => {

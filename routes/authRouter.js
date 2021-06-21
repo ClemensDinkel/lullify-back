@@ -4,32 +4,28 @@ const { Request } = require('../models/request')
 const authRouter = Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const cors = require('cors')
-authRouter.use(cors())
-
-//temporary workaround
-let refreshTokens = []
+const cookieParser = require('cookie-parser')
+authRouter.use(cookieParser())
 
 const generateAccessToken = (user) => {
-    return jwt.sign(user, process.env.SECRET, { expiresIn: '1440min' })
+    return jwt.sign(user, process.env.SECRET, { expiresIn: '10sec' })
 }
 const generateRefreshToken = (user) => {
-    return jwt.sign(user, process.env.REFRESH_SECRET)
+    return jwt.sign(user, process.env.REFRESH_SECRET, { expiresIn: '72hours'})
 }
 
 authRouter.post('/refresh', (req, res) => {
-    const refreshToken = req.header('refresh-token')
+    const refreshToken = req.cookies.refresh_token
     if (refreshToken === null) return res.status(401).send("Access denied")
-    if (!refreshTokens.includes(refreshToken)) return res.status(403).send("Token no longer valid")
     jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, user) => {
-        if(err) return res.status(403).send("Token no longer valid")
-        console.log(user)
-        const accessToken = generateAccessToken({
+        if (err) return res.status(403).send("Token no longer valid")
+        const tokenData = {
             id: user.id,
             user_name: user.user_name,
             role: user.role
-        })
-        res.json({accessToken: accessToken})
+        }
+        const accessToken = generateAccessToken(tokenData)
+        res.send({ accessToken: accessToken })
     })
 })
 
@@ -37,7 +33,7 @@ authRouter.delete('/logout', (req, res) => {
     // temporary workaround
     const tokenToDelete = req.header('refresh-token')
     refreshTokens = refreshTokens.filter(token => token !== tokenToDelete)
-    
+
     return res.status(204).send("Logout successful")
 })
 
@@ -88,7 +84,7 @@ authRouter.post('/register', async (req, res) => {
 })
 
 authRouter.post('/login', async (req, res) => {
-    console.log("login")
+
     const user = await User.findOne({ email: req.body.email } /* || {user_name : req.body.user_login} */)
     if (!user) return res.status(400).send('User not found')
 
@@ -103,8 +99,21 @@ authRouter.post('/login', async (req, res) => {
     const accessToken = generateAccessToken(userData)
     const refreshToken = generateRefreshToken(userData)
     /* res.header('auth-token', {accessToken: accessToken, refreshToken: refreshToken}) */
-    res.status(201).send({accessToken: accessToken, refreshToken: refreshToken})
-    refreshTokens.push(refreshToken)
+    res
+        .status(201)
+        .cookie('refresh_token', refreshToken, {
+            maxAge: 48 * 60 * 60 * 1000, // 48 hours
+            httpOnly: true, 
+            // secure: true,
+            // sameSite: true
+        })
+        .cookie('access_token', accessToken, {
+            maxAge: 20 * 60 * 1000, // 20 mins
+            httpOnly: true, 
+            // secure: true,
+            // sameSite: true
+        })
+        .send({ accessToken: accessToken })
 })
 
 module.exports = authRouter
