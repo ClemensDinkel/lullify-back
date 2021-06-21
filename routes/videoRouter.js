@@ -4,7 +4,9 @@ const verifyCC = require("./verifyCC");
 const verifySpecificUser = require('./verifySpecificUser');
 const verifyUser = require('./verifyUser')
 const videoRouter = Router();
-
+/* const cors = require('cors')
+videoRouter.use(cors())
+ */
 videoRouter.get('/videos', (req, res) => {
     Video.find()
         .populate('uploader_id', "_id user_name")

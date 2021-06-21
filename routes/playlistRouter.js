@@ -3,6 +3,8 @@ const { Playlist } = require('../models/playlist')
 const playlistRouter = Router();
 const verifyAdmin = require('./verifyAdmin')
 const verifyUser = require('./verifyUser')
+/* const cors = require('cors')
+playlistRouter.use(cors()) */
 
 playlistRouter.get('/playlists', verifyAdmin, (req, res) => {
     Playlist.find()
