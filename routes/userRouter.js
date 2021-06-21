@@ -7,8 +7,6 @@ const verifySpecificUser = require('./verifySpecificUser')
 const verifyCC = require('./verifyCC')
 const userRouter = Router();
 const bcrypt = require('bcryptjs')
-/* const cors = require('cors')
-userRouter.use(cors()) */
 
 userRouter.get('/users', verifyAdmin, (req, res) => {
     User.find()

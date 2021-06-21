@@ -2,8 +2,6 @@ const { Router } = require('express');
 const { Request } = require('../models/request')
 const requestRouter = Router();
 const verifyAdmin = require('./verifyAdmin') 
-const cors = require('cors')
-/* requestRouter.use(cors()) */
 
 requestRouter.get('/requests', verifyAdmin, (req, res) => {
     Request.find()

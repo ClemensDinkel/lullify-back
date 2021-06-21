@@ -4,20 +4,14 @@ const { Request } = require('../models/request')
 const authRouter = Router()
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const cors = require('cors')
 const cookieParser = require('cookie-parser')
-/* const corsOptions = {
-    origin: "http://localhost:3000",
-    credentials: true,
-}
-authRouter.use(cors(corsOptions)) */
 authRouter.use(cookieParser())
 
 const generateAccessToken = (user) => {
-    return jwt.sign(user, process.env.SECRET, { expiresIn: '1440min' })
+    return jwt.sign(user, process.env.SECRET, { expiresIn: '10sec' })
 }
 const generateRefreshToken = (user) => {
-    return jwt.sign(user, process.env.REFRESH_SECRET)
+    return jwt.sign(user, process.env.REFRESH_SECRET, { expiresIn: '72hours'})
 }
 
 authRouter.post('/refresh', (req, res) => {
@@ -108,7 +102,7 @@ authRouter.post('/login', async (req, res) => {
     res
         .status(201)
         .cookie('refresh_token', refreshToken, {
-            maxAge: 48 * 60 * 60 * 1000, //2 days
+            maxAge: 48 * 60 * 60 * 1000, // 48 hours
             httpOnly: true, 
             // secure: true,
             // sameSite: true
