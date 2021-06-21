@@ -3,7 +3,8 @@ const jwt = require('jsonwebtoken')
 const verifyAdmin = (req, res, next) => {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-    if (!token) return res.status(401).send('Access denied because of missing token')
+    /*     const token = req.header('auth-token')*/    
+    if (token === "null") return res.status(401).send('Access denied because of missing token')
     const decToken = jwt.decode(token)
     //console.log("checking role...")
     console.log(decToken)

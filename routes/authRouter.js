@@ -102,16 +102,9 @@ authRouter.post('/login', async (req, res) => {
     }
     const accessToken = generateAccessToken(userData)
     const refreshToken = generateRefreshToken(userData)
-    res.header('auth-token', {accessToken: accessToken, refreshToken: refreshToken})
+    /* res.header('auth-token', {accessToken: accessToken, refreshToken: refreshToken}) */
     res.status(201).send({accessToken: accessToken, refreshToken: refreshToken})
     refreshTokens.push(refreshToken)
-    /* const token = jwt.sign({
-        id: user._id,
-        user_name : user.user_name,
-        role : user.role 
-    } , process.env.SECRET)
-    res.header('auth-token', token)
-    res.json(token) */
 })
 
 module.exports = authRouter
