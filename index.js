@@ -11,7 +11,8 @@ const cors = require('cors')
 const corsOptions = {
     origin: "http://localhost:3000",
     credentials: true,
-}
+} 
+// insert frontend path when frontend is deployed
 require('dotenv').config();
 app.use(express.urlencoded ({extended: false}));
 app.use(cors(corsOptions))
