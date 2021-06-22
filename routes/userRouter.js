@@ -1,13 +1,11 @@
 const { Router } = require("express");
 const { User } = require("../models/user");
-const { Playlist } = require("../models/playlist");
-const { Video } = require("../models/video");
 const verifyAdmin = require("./verifyAdmin");
 const verifySpecificUser = require("./verifySpecificUser");
-const verifyCC = require("./verifyCC");
 const userRouter = Router();
 const bcrypt = require("bcryptjs");
 
+// get all users
 userRouter.get("/users", verifyAdmin, (req, res) => {
   User.find()
     .populate("favorites", "artist title video_url")
@@ -19,6 +17,7 @@ userRouter.get("/users", verifyAdmin, (req, res) => {
     .catch((err) => res.json(err));
 });
 
+//get specific user
 userRouter.get("/users/:user_id", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
   User.find({ _id: user_id })
@@ -31,26 +30,7 @@ userRouter.get("/users/:user_id", verifySpecificUser, (req, res) => {
     .catch(() => res.json("User does not exist"));
 });
 
-userRouter.get("/users/:user_id/playlists", verifySpecificUser, (req, res) => {
-  const { user_id } = req.params;
-  Playlist.find({ user_id: user_id })
-    .populate("video_list", "artist title video_url")
-    .populate("user_id", "user_name")
-    .then((playlist) => res.json(playlist))
-    .catch((err) => res.json(err));
-});
-
-userRouter.get("/users/:user_id/videos", verifySpecificUser, (req, res) => {
-  const { user_id } = req.params;
-  Video.find({ uploader_id: user_id })
-    .populate("uploader_id", "_id user_name")
-    .then((video) => res.json(video))
-    .catch((err) => res.json(err));
-});
-
-// const comparePassword = await bcrypt.compare(req.body.password, user.password)
-//if (!comparePassword) return res.status(400).send('Wrong password')
-
+//update a specific user (only doable by user himself if he has token and password)
 userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
   const { user_id } = req.params;
   let dbpw = "";
@@ -74,6 +54,7 @@ userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
     .catch((err) => res.json(err));
 });
 
+// to promote a user to content creater
 userRouter.put("/users/:user_id/promote", verifyAdmin, (req, res) => {
   const { user_id } = req.params;
   User.findOneAndUpdate(
@@ -90,19 +71,7 @@ userRouter.put("/users/:user_id/promote", verifyAdmin, (req, res) => {
     .catch((err) => res.json(err));
 });
 
-userRouter.put("/users/:user_id/makeAdmin", verifyAdmin, (req, res) => {
-  const { user_id } = req.params;
-  User.findOneAndUpdate({ _id: user_id }, { role: "admin" })
-    .then((user) =>
-      res.json(
-        user === null
-          ? "User can't be promoted"
-          : "User has been promoted to admin"
-      )
-    )
-    .catch((err) => res.json(err));
-});
-
+//To demote a content creator to user
 userRouter.put("/users/:user_id/demote", verifyAdmin, (req, res) => {
   const { user_id } = req.params;
   User.findOneAndUpdate(
@@ -119,67 +88,30 @@ userRouter.put("/users/:user_id/demote", verifyAdmin, (req, res) => {
     .catch((err) => res.json(err));
 });
 
-//Change to get all playlist in order ro get playlist by id
-userRouter.get("/users/:user_id/playlists", verifySpecificUser, (req, res) => {
+// make someone an admin (handle with care!!!)
+userRouter.put("/users/:user_id/makeAdmin", verifyAdmin, (req, res) => {
   const { user_id } = req.params;
-
-  Playlist.findOne({ user_id: user_id })
-    .populate("video_list", "title")
-    .then((playlist) => res.json(playlist))
+  User.findOneAndUpdate({ _id: user_id }, { role: "admin" })
+    .then((user) =>
+      res.json(
+        user === null
+          ? "User can't be promoted"
+          : "User has been promoted to admin"
+      )
+    )
     .catch((err) => res.json(err));
 });
 
-userRouter.put(
-  "/users/:user_id/playlists/:playlist_id",
-  verifySpecificUser,
-  (req, res) => {
-    const { playlist_id } = req.params;
-    Playlist.findOneAndUpdate({ _id: playlist_id }, req.body)
-      .then((playlist) => res.json(playlist))
-      .catch((err) => res.json(err));
-  }
-);
-
+// delete a specific user (only available to user himself and admin)
 userRouter.delete("/users/:user_id", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
-  User.deleteOne({ _id: user_id })
-    .then(() => res.json("User has been deleted successfully"))
+  User.findOneAndDelete({ _id: user_id, role: "user" || "content_creator"})
+    .then((user) => {
+      user === null 
+      ? res.json("User doesn't exist or is an admin") 
+      : res.json("User has been deleted successfully")
+    })
     .catch((err) => res.json(err));
 });
-
-userRouter.delete(
-  "/users/:user_id/playlists/:playlist_id",
-  verifySpecificUser,
-  (req, res) => {
-    const { playlist_id } = req.params;
-    Playlist.findOneAndDelete({ _id: playlist_id })
-      .then(res.json("Playlist has been deleted successfully"))
-      .catch((err) => res.json(err));
-  }
-);
-
-userRouter.put(
-  "/users/:user_id/videos/:video_id",
-  verifyCC,
-  verifySpecificUser,
-  (req, res) => {
-    const { video_id } = req.params;
-    Video.findOneAndUpdate({ _id: video_id }, req.body)
-      .then((video) => res.json(video))
-      .catch((err) => res.json(err));
-  }
-);
-
-userRouter.delete(
-  "/users/:user_id/videos/:video_id",
-  verifyCC,
-  verifySpecificUser,
-  (req, res) => {
-    const { video_id } = req.params;
-    Video.deleteOne({ _id: video_id })
-      .then(() => res.json("Video has been deleted successfully"))
-      .catch((err) => res.json(err));
-  }
-);
 
 module.exports = userRouter;

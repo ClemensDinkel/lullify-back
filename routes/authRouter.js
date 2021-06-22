@@ -8,12 +8,13 @@ const cookieParser = require('cookie-parser')
 authRouter.use(cookieParser())
 
 const generateAccessToken = (user) => {
-    return jwt.sign(user, process.env.SECRET, { expiresIn: '10sec' })
+    return jwt.sign(user, process.env.SECRET, { expiresIn: '20mins' })
 }
 const generateRefreshToken = (user) => {
     return jwt.sign(user, process.env.REFRESH_SECRET, { expiresIn: '72hours'})
 }
 
+// refresh accesstoken using refreshtoken
 authRouter.post('/refresh', (req, res) => {
     const refreshToken = req.cookies.refresh_token
     if (refreshToken === null) return res.status(401).send("Access denied")
@@ -29,6 +30,7 @@ authRouter.post('/refresh', (req, res) => {
     })
 })
 
+// logout deleting access and refresh tokens
 authRouter.delete('/logout', (req, res) => {
     // temporary workaround
     const tokenToDelete = req.header('refresh-token')
@@ -37,6 +39,7 @@ authRouter.delete('/logout', (req, res) => {
     return res.status(204).send("Logout successful")
 })
 
+// register a new user
 authRouter.post('/register', async (req, res) => {
     if (!req.body.password) return res.send('No password provided')
     const checkEmail = await User.findOne({ email: req.body.email })
@@ -83,6 +86,8 @@ authRouter.post('/register', async (req, res) => {
     }
 })
 
+
+// login to get access and refresh token
 authRouter.post('/login', async (req, res) => {
 
     const user = await User.findOne({ email: req.body.email } /* || {user_name : req.body.user_login} */)

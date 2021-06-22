@@ -3,6 +3,7 @@ const { Request } = require('../models/request')
 const requestRouter = Router();
 const verifyAdmin = require('./verifyAdmin') 
 
+// get all requests
 requestRouter.get('/requests', verifyAdmin, (req, res) => {
     Request.find()
         .populate('user_id', "_id user_name email phone city_name city_code country company")
@@ -10,6 +11,7 @@ requestRouter.get('/requests', verifyAdmin, (req, res) => {
         .catch(err => res.json(err))
 })
 
+// get a specific request
 requestRouter.get('/requests/:request_id', verifyAdmin, (req, res) => {
     const {request_id} = req.params
     Request.find({_id : request_id})
@@ -18,6 +20,7 @@ requestRouter.get('/requests/:request_id', verifyAdmin, (req, res) => {
         .catch(err => res.json(err))
 })
 
+// delete a specific request
 requestRouter.delete('/requests/:request_id', verifyAdmin, (req, res) => {
     const {request_id} = req.params
     Request.findOneAndDelete({_id: request_id})
