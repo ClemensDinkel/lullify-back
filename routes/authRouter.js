@@ -109,8 +109,8 @@ authRouter.post('/login', async (req, res) => {
         .cookie('refresh_token', refreshToken, {
             maxAge: 48 * 60 * 60 * 1000, // 48 hours
             httpOnly: true, 
-            /* secure: true,
-            sameSite: none */
+            secure: true,
+            sameSite: none
         })
         /* .cookie('access_token', accessToken, {
             maxAge: 20 * 60 * 1000, // 20 mins
