@@ -105,14 +105,14 @@ authRouter.post('/login', async (req, res) => {
             maxAge: 48 * 60 * 60 * 1000, // 48 hours
             httpOnly: true, 
             // secure: true,
-            // sameSite: true
+            // sameSite: none
         })
-        .cookie('access_token', accessToken, {
+        /* .cookie('access_token', accessToken, {
             maxAge: 20 * 60 * 1000, // 20 mins
             httpOnly: true, 
             // secure: true,
-            // sameSite: true
-        })
+            // sameSite: none
+        }) */
         .send({ accessToken: accessToken })
 })
 
