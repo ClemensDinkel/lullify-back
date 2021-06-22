@@ -86,7 +86,6 @@ authRouter.post('/register', async (req, res) => {
     }
 })
 
-
 // login to get access and refresh token
 authRouter.post('/login', async (req, res) => {
 
