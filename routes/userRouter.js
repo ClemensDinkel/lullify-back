@@ -36,10 +36,7 @@ userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
   let dbpw = "";
   await User.findOne({ _id: user_id })
     .exec()
-    .then((res) => {
-      console.log(res.password);
-      dbpw = res.password;
-    });
+    .then(res => dbpw = res.password);
   const comparePassword = await bcrypt.compare(req.body.currentPassword, dbpw);
   if (!comparePassword) return res.status(400).send("Wrong password");
   let user = req.body;

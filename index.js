@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -13,7 +14,7 @@ const corsOptions = {
     credentials: true,
 } 
 // insert frontend path when frontend is deployed
-require('dotenv').config();
+
 app.use(express.urlencoded ({extended: false}));
 app.use(cors(corsOptions))
 mongoose.connect(process.env.MONGO_DB, {useNewUrlParser : true, useUnifiedTopology : true});
