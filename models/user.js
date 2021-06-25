@@ -54,10 +54,6 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Video' 
     }],
-    /* playlists: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Playlist' 
-    }] */
 })
 
 UserSchema.plugin(uniqueValidator);
