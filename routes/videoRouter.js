@@ -61,6 +61,25 @@ videoRouter.put("/videos/:video_id/report", verifyUser, async (req, res) => {
     .catch((err) => res.json(err));
 });
 
+//"unreport" a video in case you missclicked
+videoRouter.put("/videos/:video_id/unreport", verifyUser, async (req, res) => {
+  const { video_id } = req.params;
+  const { user_id } = req.body;
+  let video = {};
+  await Video.findOne({ _id: video_id })
+    .exec()
+    .then((res) => (video = res));
+  console.log(video);
+  if (!video.reportedBy.includes(user_id))
+    return res.status(409).send("Video has never been reported by this user.");
+  video.reports--;
+  video.reportedBy.splice(video.reportedBy.indexOf(user_id), 1)   
+  Video.findOneAndUpdate({ _id: video_id }, video)
+    .then((res) => res.json(video))
+    .catch((err) => res.json(err));
+});
+
+
 // get all videos of one uploader
 videoRouter.get("/users/:user_id/videos", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
