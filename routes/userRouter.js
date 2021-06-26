@@ -134,4 +134,48 @@ userRouter.delete("/users/:user_id", verifySpecificUser, (req, res) => {
     .catch((err) => res.json(err));
 });
 
+// add video fo favorites
+userRouter.put(
+  "/users/:user_id/favorites",
+  verifySpecificUser,
+  async (req, res) => {
+    const { user_id } = req.params;
+    const { video_id } = req.body;
+
+    let user = {};
+    await User.findOne({ _id: user_id })
+      .exec()
+      .then((res) => (user = res));
+    console.log(user);
+    if (user.favorites.includes(video_id))
+      return res.status(409).send("Video already exist.");
+    user.favorites.push(video_id);
+    User.findOneAndUpdate({ _id: user_id }, user)
+      .then((res) => res.json(user))
+      .catch((err) => res.json(err));
+  }
+);
+
+//to remove video from favorites
+userRouter.put(
+  "/users/:user_id/removefavorites",
+  verifySpecificUser,
+  async (req, res) => {
+    const { user_id } = req.params;
+    const { video_id } = req.body;
+
+    let user = {};
+    await User.findOne({ _id: user_id })
+      .exec()
+      .then((res) => (user = res));
+    console.log(user);
+    if (!user.favorites.includes(video_id))
+      return res.status(409).send("Video doesn't exist.");
+    user.favorites.splice(user.favorites.indexOf(video_id), 1);
+    User.findOneAndUpdate({ _id: user_id }, user)
+      .then((res) => res.json(user))
+      .catch((err) => res.json(err));
+  }
+);
+
 module.exports = userRouter;
