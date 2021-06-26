@@ -30,13 +30,13 @@ authRouter.post("/refresh", (req, res) => {
   });
 });
 
-// logout deleting access and refresh tokens
-authRouter.delete("/logout", (req, res) => {
-  // temporary workaround
-  const tokenToDelete = req.header("refresh-token");
-  refreshTokens = refreshTokens.filter((token) => token !== tokenToDelete);
-
-  return res.status(204).send("Logout successful");
+// logout deleting access (on frontend) and refresh token (here)
+authRouter.get("/logout", (req, res) => {
+  /* cookies.set('refresh_token', { expires: Date.now() }); */
+  res
+    .clearCookie("refresh_token")
+    .status(204)
+    .send("Logout successful");
 });
 
 // register a new user
