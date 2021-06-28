@@ -61,9 +61,9 @@ playlistRouter.put(
   }
 );
 
-//To add videos to playlist
+//To add videos to playlist for specific user
 playlistRouter.put(
-  "/users/:user_id/playlists/:playlist_id/video",
+  "/users/:user_id/playlists/:playlist_id/addvideo",
   verifySpecificUser,
   async (req, res) => {
     const { playlist_id } = req.params;
@@ -74,8 +74,31 @@ playlistRouter.put(
       .then((res) => (playlist = res));
     console.log(playlist);
     if (playlist.video_list.includes(video_id))
-      return res.status(409).send("Video already exist.");
+      return res.status(409).send("Video is already part of the playlist.");
     playlist.video_list.push(video_id);
+    Playlist.findOneAndUpdate({ _id: playlist_id }, playlist)
+      .then((res) => res.json(playlist))
+      .catch((err) => res.json(err));
+  }
+);
+
+//To remove video to playlist for specific user
+playlistRouter.put(
+  "/users/:user_id/playlists/:playlist_id/removevideo",
+  verifySpecificUser,
+  async (req, res) => {
+    const { playlist_id } = req.params;
+    const { video_id } = req.body;
+    let playlist = {};
+    await Playlist.findOne({ _id: playlist_id })
+      .exec()
+      .then((res) => (playlist = res));
+    console.log(playlist);
+    if (!playlist.video_list.includes(video_id))
+      return res
+        .status(409)
+        .send("Video isn't part of the playlist and can't be removed.");
+    playlist.video_list.splice(playlist.video_list.indexOf(video_id), 1);
     Playlist.findOneAndUpdate({ _id: playlist_id }, playlist)
       .then((res) => res.json(playlist))
       .catch((err) => res.json(err));
