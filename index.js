@@ -12,6 +12,7 @@ const cors = require("cors");
 const corsOptions = {
   origin: "http://localhost:3000",
   credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
 };
 // insert frontend path when frontend is deployed
 
