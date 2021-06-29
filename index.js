@@ -9,13 +9,21 @@ const playlistRouter = require("./routes/playlistRouter");
 const authRouter = require("./routes/authRouter");
 const requestRouter = require("./routes/requestRouter");
 const cors = require("cors");
-const corsOptions = {
+/* const corsOptions = {
   origin: "http://localhost:3000/",
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"]
-};
+}; */
+
+app.use((req, res, next) => {
+  res.append('Access-Control-Allow-Origin', ['*']);
+  res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.append('Access-Control-Allow-Headers', 'Content-Type');
+  res.append('Access-Control-Allow-Credentials', true)
+  next();
+});
 // insert frontend path when frontend is deployed
-app.use(cors(corsOptions))
+/* app.use(cors(corsOptions)) */
 /* app.use(express.urlencoded ({extended: false})); */
 app.use(express.json());
 mongoose.connect(process.env.MONGO_DB, {useNewUrlParser : true, useUnifiedTopology : true});
