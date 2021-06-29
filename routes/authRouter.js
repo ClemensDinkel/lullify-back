@@ -8,7 +8,7 @@ const cookieParser = require("cookie-parser");
 authRouter.use(cookieParser());
 
 const generateAccessToken = (user) => {
-  return jwt.sign(user, process.env.SECRET, { expiresIn: "20mins" });
+  return jwt.sign(user, process.env.SECRET, { expiresIn: "10sec" }); // "20mins"
 };
 const generateRefreshToken = (user) => {
   return jwt.sign(user, process.env.REFRESH_SECRET, { expiresIn: "72hours" });
