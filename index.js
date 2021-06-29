@@ -18,7 +18,7 @@ const cors = require("cors");
 app.use((req, res, next) => {
   res.append('Access-Control-Allow-Origin', ['*']);
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.append('Access-Control-Allow-Headers', 'Content-Type');
+  res.append('Access-Control-Allow-Headers', ['Content-Type', 'Authorization']);
   res.append('Access-Control-Allow-Credentials', true)
   next();
 });
