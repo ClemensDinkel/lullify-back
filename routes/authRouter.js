@@ -100,7 +100,7 @@ authRouter.post("/register", async (req, res) => {
 
 // login to get access and refresh token
 authRouter.post("/login", async (req, res) => {
-  console.log(req.body)
+  console.log(req)
   const user = await User.findOne(
     { email: req.body.email } /* || {user_name : req.body.user_login} */
   );
