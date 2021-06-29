@@ -10,8 +10,8 @@ const authRouter = require("./routes/authRouter");
 const requestRouter = require("./routes/requestRouter");
 const cors = require("cors");
 const corsOptions = {
-  origin: /* "*"  */ "http://localhost:3000",
-  credentials: true,
+  origin: "*",
+  /* credentials: true, */
   allowedHeaders: ["Content-Type", "Authorization"]
 };
 // insert frontend path when frontend is deployed
