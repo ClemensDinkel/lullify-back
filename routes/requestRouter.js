@@ -6,7 +6,7 @@ const verifyAdmin = require('./verifyAdmin')
 // get all requests
 requestRouter.get('/requests', verifyAdmin, (req, res) => {
     Request.find()
-        .populate('user_id', "_id user_name email phone city_name city_code country company")
+        .populate('user_id', "_id user_name first_name last_name email phone street house_nr city_name city_code country company reg_date")
         .then(request => res.json(request))
         .catch(err => res.json(err))
 })
@@ -15,7 +15,7 @@ requestRouter.get('/requests', verifyAdmin, (req, res) => {
 requestRouter.get('/requests/:request_id', verifyAdmin, (req, res) => {
     const {request_id} = req.params
     Request.find({_id : request_id})
-        .populate('user_id', "_id user_name email phone city_name city_code country company")
+        .populate('user_id', "_id user_name first_name last_name email phone street house_nr city_name city_code country company reg_date")
         .then(request => res.json(request))
         .catch(err => res.json(err))
 })

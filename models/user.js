@@ -37,13 +37,15 @@ const UserSchema = new Schema({
     },
     user_img_url: {
         type: String,
-        default: "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png"
+        default: "https://www.pngitem.com/pimgs/m/30-307416_profile-icon-png-image-free-download-searchpng-employee.png"
     },
     reg_date: { 
         type: Date, 
         default: Date.now() 
     },
     phone: String,
+    street: String,
+    house_nr: String,
     city_code: String,
     city_name: String,
     country: String,
@@ -52,10 +54,6 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Video' 
     }],
-    /* playlists: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Playlist' 
-    }] */
 })
 
 UserSchema.plugin(uniqueValidator);

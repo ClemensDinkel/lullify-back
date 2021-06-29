@@ -24,7 +24,8 @@ const VideoSchema = new Schema( {
         default: "https://i.stack.imgur.com/PtbGQ.png"
     },
     short_description: {
-        type : String
+        type : String,
+        required: true
     },
     duration: Number,
     adding_date: {

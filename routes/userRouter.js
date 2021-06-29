@@ -36,10 +36,7 @@ userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
   let dbpw = "";
   await User.findOne({ _id: user_id })
     .exec()
-    .then((res) => {
-      console.log(res.password);
-      dbpw = res.password;
-    });
+    .then((res) => (dbpw = res.password));
   const comparePassword = await bcrypt.compare(req.body.currentPassword, dbpw);
   if (!comparePassword) return res.status(400).send("Wrong password");
   let user = req.body;
@@ -53,6 +50,51 @@ userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
     .then((user) => res.json(user))
     .catch((err) => res.json(err));
 });
+
+//to add videos to favourites for specific user
+
+userRouter.put(
+  "/users/:user_id/favorites",
+  verifySpecificUser,
+  async (req, res) => {
+    const { user_id } = req.params;
+    const { video_id } = req.body;
+
+    let user = {};
+    await User.findOne({ _id: user_id })
+      .exec()
+      .then((res) => (user = res));
+    console.log(user);
+    if (user.favorites.includes(video_id))
+      return res.status(409).send("Video already exist.");
+    user.favorites.push(video_id);
+    User.findOneAndUpdate({ _id: user_id }, user)
+      .then((res) => res.json(user))
+      .catch((err) => res.json(err));
+  }
+);
+
+//to remove video from favorites
+userRouter.put(
+  "/users/:user_id/removefavorites",
+  verifySpecificUser,
+  async (req, res) => {
+    const { user_id } = req.params;
+    const { video_id } = req.body;
+
+    let user = {};
+    await User.findOne({ _id: user_id })
+      .exec()
+      .then((res) => (user = res));
+    console.log(user);
+    if (!user.favorites.includes(video_id))
+      return res.status(409).send("Video doesn't exist.");
+    user.favorites.splice(user.favorites.indexOf(video_id), 1);
+    User.findOneAndUpdate({ _id: user_id }, user)
+      .then((res) => res.json(user))
+      .catch((err) => res.json(err));
+  }
+);
 
 // to promote a user to content creater
 userRouter.put("/users/:user_id/promote", verifyAdmin, (req, res) => {
@@ -105,11 +147,11 @@ userRouter.put("/users/:user_id/makeAdmin", verifyAdmin, (req, res) => {
 // delete a specific user (only available to user himself and admin)
 userRouter.delete("/users/:user_id", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
-  User.findOneAndDelete({ _id: user_id, role: "user" || "content_creator"})
+  User.findOneAndDelete({ _id: user_id, role: "user" || "content_creator" })
     .then((user) => {
-      user === null 
-      ? res.json("User doesn't exist or is an admin") 
-      : res.json("User has been deleted successfully")
+      user === null
+        ? res.json("User doesn't exist or is an admin")
+        : res.json("User has been deleted successfully");
     })
     .catch((err) => res.json(err));
 });
