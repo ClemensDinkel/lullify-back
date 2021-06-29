@@ -15,9 +15,8 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"]
 };
 // insert frontend path when frontend is deployed
-
-app.use(express.urlencoded ({extended: false}));
 app.use(cors(corsOptions))
+app.use(express.urlencoded ({extended: false}));
 mongoose.connect(process.env.MONGO_DB, {useNewUrlParser : true, useUnifiedTopology : true});
 
 app.get("/", (req, res) => {
