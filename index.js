@@ -11,7 +11,7 @@ const requestRouter = require("./routes/requestRouter");
 const cors = require("cors");
 const corsOptions = {
   origin: "*", //["http://localhost:3000","https://thirsty-jang-8e90b8.netlify.app/"],
-  credentials: true,
+  /* credentials: true, */
   allowedHeaders: ["Content-Type", "Authorization"]
 };
 
