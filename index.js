@@ -31,7 +31,7 @@ const corsOptions = {
 });  */
 
 // insert frontend path when frontend is deployed
-/* app.use(cors(corsOptions)) */
+app.use(cors(corsOptions))
 app.use(express.urlencoded ({extended: false}));
 app.use(express.json());
 mongoose.connect(process.env.MONGO_DB, {useNewUrlParser : true, useUnifiedTopology : true});
