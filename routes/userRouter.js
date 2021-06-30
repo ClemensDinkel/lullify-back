@@ -32,6 +32,7 @@ userRouter.get("/users/:user_id", verifySpecificUser, (req, res) => {
 
 //update a specific user (only doable by user himself if he has token and password)
 userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
+  console.log(req.body)
   const { user_id } = req.params;
   let dbpw = "";
   await User.findOne({ _id: user_id })
