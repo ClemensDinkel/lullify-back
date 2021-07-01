@@ -24,7 +24,7 @@ requestRouter.get('/requests/:request_id', verifyAdmin, (req, res) => {
 requestRouter.delete('/requests/:request_id', verifyAdmin, (req, res) => {
     const {request_id} = req.params
     Request.findOneAndDelete({_id: request_id})
-        .then(() => res.json('Request has been deleted'))
+        .then(() => res.json('Request has been deleted'))  // return request_id for immediate frontend update?
         .catch(err => res.json(err))
 })
 module.exports = requestRouter;

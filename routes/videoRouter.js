@@ -51,13 +51,12 @@ videoRouter.put("/videos/:video_id/report", verifyUser, async (req, res) => {
   await Video.findOne({ _id: video_id })
     .exec()
     .then((res) => (video = res));
-  console.log(video);
   if (video.reportedBy.includes(user_id))
     return res.status(409).send("Video already reported by this user.");
   video.reports++;
   video.reportedBy.push(user_id);
-  Video.findOneAndUpdate({ _id: video_id }, video)
-    .then((res) => res.json(video))
+  Video.findOneAndUpdate({ _id: video_id }, video, {new: true})
+    .then((video) => res.json(video))
     .catch((err) => res.json(err));
 });
 
@@ -69,13 +68,12 @@ videoRouter.put("/videos/:video_id/unreport", verifyUser, async (req, res) => {
   await Video.findOne({ _id: video_id })
     .exec()
     .then((res) => (video = res));
-  console.log(video);
   if (!video.reportedBy.includes(user_id))
     return res.status(409).send("Video has never been reported by this user.");
   video.reports--;
   video.reportedBy.splice(video.reportedBy.indexOf(user_id), 1)   
-  Video.findOneAndUpdate({ _id: video_id }, video)
-    .then((res) => res.json(video))
+  Video.findOneAndUpdate({ _id: video_id }, video, {new: true})
+    .then((video) => res.json(video))
     .catch((err) => res.json(err));
 });
 
@@ -85,7 +83,7 @@ videoRouter.get("/users/:user_id/videos", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
   Video.find({ uploader_id: user_id })
     .populate("uploader_id", "_id user_name")
-    .then((video) => res.json(video))
+    .then((videos) => res.json(videos))
     .catch((err) => res.json(err));
 });
 
@@ -96,7 +94,7 @@ videoRouter.put(
   verifySpecificUser,
   (req, res) => {
     const { video_id } = req.params;
-    Video.findOneAndUpdate({ _id: video_id }, req.body)
+    Video.findOneAndUpdate({ _id: video_id }, req.body, {new: true})
       .then((video) => res.json(video))
       .catch((err) => res.json(err));
   }
@@ -110,7 +108,7 @@ videoRouter.delete(
   (req, res) => {
     const { video_id } = req.params;
     Video.deleteOne({ _id: video_id })
-      .then(() => res.json("Video has been deleted successfully"))
+      .then(() => res.json("Video has been deleted successfully")) // return video_id as well for immediate update on frontend?
       .catch((err) => res.json(err));
   }
 );

@@ -76,31 +76,20 @@ authRouter.post("/register", async (req, res) => {
     user_id: user._id,
   });
 
-  console.log(user);
-  console.log(request);
-  console.log(requested_to_be_cc);
-
   user
     .save()
-    .then((user) => {
-      console.log("user created");
-      res.json(user);
-    })
+    .then((user) => res.json(user))
     .catch((err) => res.json(err));
   if (requested_to_be_cc && request.user_id != null) {
     request
       .save()
-      .then((request) => {
-        console.log("request created");
-        res.json(request);
-      })
+      .then((request) => res.json(request))
       .catch((err) => res.json(err));
   }
 });
 
 // login to get access and refresh token
 authRouter.post("/login", async (req, res) => {
-  console.log(req.body)
   const user = await User.findOne(
     { email: req.body.email } /* || {user_name : req.body.user_login} */
   );

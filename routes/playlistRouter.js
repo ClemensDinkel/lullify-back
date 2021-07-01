@@ -5,7 +5,7 @@ const verifyAdmin = require("./verifyAdmin");
 const verifyUser = require("./verifyUser");
 const verifySpecificUser = require("./verifySpecificUser");
 
-// to get all playlist (only admin can have access)
+// get all playlists (only admin)
 playlistRouter.get("/playlists", verifyAdmin, (req, res) => {
   Playlist.find()
     .populate("video_list", "artist title video_url")
@@ -21,7 +21,7 @@ playlistRouter.post("/playlists", verifyUser, (req, res) => {
     .catch((err) => res.json(err));
 });
 
-//Get playlists for specific user
+// get all playlists for specific user
 playlistRouter.get(
   "/users/:user_id/playlists",
   verifySpecificUser,
@@ -30,7 +30,7 @@ playlistRouter.get(
 
     Playlist.find({ user_id: user_id }) //get with findOne only gave one result from data base
       .populate("video_list", "title")
-      .then((playlist) => res.json(playlist))
+      .then((playlists) => res.json(playlists))
       .catch((err) => res.json(err));
   }
 );
@@ -55,7 +55,7 @@ playlistRouter.put(
   verifySpecificUser,
   (req, res) => {
     const { playlist_id } = req.params;
-    Playlist.findOneAndUpdate({ _id: playlist_id }, req.body)
+    Playlist.findOneAndUpdate({ _id: playlist_id }, req.body, {new: true})
       .then((playlist) => res.json(playlist))
       .catch((err) => res.json(err));
   }
@@ -71,13 +71,13 @@ playlistRouter.put(
     let playlist = {};
     await Playlist.findOne({ _id: playlist_id })
       .exec()
-      .then((res) => (playlist = res));
-    console.log(playlist);
+      .then((res) => (playlist = res))
+      .catch(err => res.json(err))
     if (playlist.video_list.includes(video_id))
       return res.status(409).send("Video is already part of the playlist.");
     playlist.video_list.push(video_id);
-    Playlist.findOneAndUpdate({ _id: playlist_id }, playlist)
-      .then((res) => res.json(playlist))
+    Playlist.findOneAndUpdate({ _id: playlist_id }, playlist, {new: true})
+      .then((playlist) => res.json(playlist))
       .catch((err) => res.json(err));
   }
 );
@@ -93,14 +93,13 @@ playlistRouter.put(
     await Playlist.findOne({ _id: playlist_id })
       .exec()
       .then((res) => (playlist = res));
-    console.log(playlist);
     if (!playlist.video_list.includes(video_id))
       return res
         .status(409)
         .send("Video isn't part of the playlist and can't be removed.");
     playlist.video_list.splice(playlist.video_list.indexOf(video_id), 1);
     Playlist.findOneAndUpdate({ _id: playlist_id }, playlist)
-      .then((res) => res.json(playlist))
+      .then((res) => res.json(video_id))
       .catch((err) => res.json(err));
   }
 );
