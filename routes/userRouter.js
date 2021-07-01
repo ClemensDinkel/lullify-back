@@ -46,7 +46,7 @@ userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
     user.password = hashPassword;
   } else user.password = dbpw;
   // maybe there is a better way without making a second call
-  User.findOneAndUpdate({ _id: user_id }, user, {new: true})
+  User.findOneAndUpdate({ _id: user_id }, user, { new: true })
     .then((user) => res.json(user))
     .catch((err) => res.json(err));
 });
@@ -67,7 +67,8 @@ userRouter.put(
     if (user.favorites.includes(video_id))
       return res.status(409).send("Video already a favorite.");
     user.favorites.push(video_id);
-    User.findOneAndUpdate({ _id: user_id }, user, {new: true})
+    User.findOneAndUpdate({ _id: user_id }, user, { new: true })
+      .populate("favorites", "artist title video_url")
       .then((user) => res.json(user.favorites))
       .catch((err) => res.json(err));
   }
@@ -88,7 +89,8 @@ userRouter.put(
     if (!user.favorites.includes(video_id))
       return res.status(409).send("Video isn't a favorite.");
     user.favorites.splice(user.favorites.indexOf(video_id), 1);
-    User.findOneAndUpdate({ _id: user_id }, user, {new: true})
+    User.findOneAndUpdate({ _id: user_id }, user, { new: true })
+      .populate("favorites", "artist title video_url")
       .then((user) => res.json(user.favorites))
       .catch((err) => res.json(err));
   }

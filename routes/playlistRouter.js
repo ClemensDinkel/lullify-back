@@ -29,7 +29,8 @@ playlistRouter.get(
     const { user_id } = req.params;
 
     Playlist.find({ user_id: user_id }) //get with findOne only gave one result from data base
-      .populate("video_list", "title")
+      .populate("video_list", "artist title video_url")
+      .populate("user_id", "user_name")
       .then((playlists) => res.json(playlists))
       .catch((err) => res.json(err));
   }
@@ -55,7 +56,9 @@ playlistRouter.put(
   verifySpecificUser,
   (req, res) => {
     const { playlist_id } = req.params;
-    Playlist.findOneAndUpdate({ _id: playlist_id }, req.body, {new: true})
+    Playlist.findOneAndUpdate({ _id: playlist_id }, req.body, { new: true })
+      .populate("video_list", "artist title video_url")
+      .populate("user_id", "user_name")
       .then((playlist) => res.json(playlist))
       .catch((err) => res.json(err));
   }
@@ -76,7 +79,9 @@ playlistRouter.put(
     if (playlist.video_list.includes(video_id))
       return res.status(409).send("Video is already part of the playlist.");
     playlist.video_list.push(video_id);
-    Playlist.findOneAndUpdate({ _id: playlist_id }, playlist, {new: true})
+    Playlist.findOneAndUpdate({ _id: playlist_id }, playlist, { new: true })
+      .populate("video_list", "artist title video_url")
+      .populate("user_id", "user_name")
       .then((playlist) => res.json(playlist))
       .catch((err) => res.json(err));
   }
@@ -98,19 +103,23 @@ playlistRouter.put(
         .status(409)
         .send("Video isn't part of the playlist and can't be removed.");
     playlist.video_list.splice(playlist.video_list.indexOf(video_id), 1);
-    Playlist.findOneAndUpdate({ _id: playlist_id }, playlist)
-      .then((res) => res.json(video_id))
+    Playlist.findOneAndUpdate({ _id: playlist_id }, playlist, { new: true })
+      .populate("video_list", "artist title video_url")
+      .populate("user_id", "user_name")
+      .then((playlist) => res.json(playlist))
       .catch((err) => res.json(err));
   }
 );
 
-// delete playlists  of specific user
+// delete playlist of specific user
 playlistRouter.delete(
   "/users/:user_id/playlists/:playlist_id",
   verifySpecificUser,
   (req, res) => {
     const { playlist_id } = req.params;
     Playlist.findOneAndDelete({ _id: playlist_id })
+      .populate("video_list", "artist title video_url")
+      .populate("user_id", "user_name")
       .then(res.json("Playlist has been deleted successfully"))
       .catch((err) => res.json(err));
   }
