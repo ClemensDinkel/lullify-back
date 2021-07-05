@@ -13,6 +13,7 @@ videoRouter.get("/videos", (req, res) => {
   else if (lang) query.languages = lang
   else if (filter) query = {$text: {$search : filter}}  // need to create index which is in video schema
   Video.find(query)
+    .lean()
     .populate("uploader_id", "_id user_name")
     .then((videos) => res.json(videos))
     .catch((err) => res.json(err));
