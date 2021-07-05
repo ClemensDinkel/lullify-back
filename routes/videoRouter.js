@@ -8,7 +8,6 @@ const videoRouter = Router();
 // get all videos
 videoRouter.get("/videos", (req, res) => {
   const { lang, filter } = req.query
-  let filterArr = null;
   let query = {}
   if (filter && lang) query.$and = [{languages: lang}, {$text: {$search : filter}}]
   else if (lang) query.languages = lang
