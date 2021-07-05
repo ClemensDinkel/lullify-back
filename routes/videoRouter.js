@@ -9,9 +9,9 @@ const videoRouter = Router();
 videoRouter.get("/videos", (req, res) => {
   const { lang, filter } = req.query
   let query = {}
-  if (filter && lang) query.$and = [{languages: lang}, {$text: {$search : filter}}]
+  if (filter && lang) query.$and = [{ languages: lang }, { $text: { $search: filter } }]
   else if (lang) query.languages = lang
-  else if (filter) query = {$text: {$search : filter}}  // need to create index which is in video schema
+  else if (filter) query = { $text: { $search: filter } }  // need to create index which is in video schema
   Video.find(query)
     .lean()
     .populate("uploader_id", "_id user_name")
@@ -27,6 +27,7 @@ videoRouter.get(
   (req, res) => {
     const { user_id } = req.params;
     Video.find({ uploader_id: user_id })
+      .lean()
       .populate("uploader_id", "_id user_name")
       .then((video) => res.json(video))
       .catch((err) => res.json(err));
@@ -37,6 +38,7 @@ videoRouter.get(
 videoRouter.get("/videos/:video_id", (req, res) => {
   const { video_id } = req.params;
   Video.find({ _id: video_id })
+    .lean()
     .populate("uploader_id", "_id user_name")
     .then((video) => res.json(video))
     .catch((err) => res.json(err));
@@ -88,6 +90,7 @@ videoRouter.put("/videos/:video_id/unreport", verifyUser, async (req, res) => {
 videoRouter.get("/users/:user_id/videos", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
   Video.find({ uploader_id: user_id })
+    .lean()
     .populate("uploader_id", "_id user_name")
     .then((videos) => res.json(videos))
     .catch((err) => res.json(err));

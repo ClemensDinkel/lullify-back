@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 // get all users
 userRouter.get("/users", verifyAdmin, (req, res) => {
   User.find()
+    .lean()
     .populate("favorites", "artist title video_url")
     .populate({
       path: "playlists",
@@ -21,6 +22,7 @@ userRouter.get("/users", verifyAdmin, (req, res) => {
 userRouter.get("/users/:user_id", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
   User.find({ _id: user_id })
+    .lean()
     .populate("favorites", "artist title video_url")
     .populate({
       path: "playlists",

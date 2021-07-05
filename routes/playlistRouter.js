@@ -8,6 +8,7 @@ const verifySpecificUser = require("./verifySpecificUser");
 // get all playlists (only admin)
 playlistRouter.get("/playlists", verifyAdmin, (req, res) => {
   Playlist.find()
+    .lean()
     .populate("video_list", "artist title video_url")
     .populate("user_id", "user_name")
     .then((playlist) => res.json(playlist))
@@ -29,6 +30,7 @@ playlistRouter.get(
     const { user_id } = req.params;
 
     Playlist.find({ user_id: user_id }) //get with findOne only gave one result from data base
+      .lean()
       .populate("video_list", "artist title video_url")
       .populate("user_id", "user_name")
       .then((playlists) => res.json(playlists))
@@ -43,6 +45,7 @@ playlistRouter.get(
   (req, res) => {
     const { playlist_id } = req.params;
     Playlist.find({ _id: playlist_id })
+      .lean()  
       .populate("video_list", "artist title video_url")
       .populate("user_id", "user_name")
       .then((playlist) => res.json(playlist))
