@@ -9,35 +9,15 @@ const videoRouter = Router();
 videoRouter.get("/videos", (req, res) => {
   const { lang, filter } = req.query
   let filterArr = null;
-  if (filter) filterArr = filter.split(" ")
-  const reg = new RegExp(filter)
-  console.log(lang)
-  console.log(filter)
-  console.log(reg)
-  console.log(filterArr)
   let query = {}
-  /* if (lang && filter) query.$and = [{languages: lang}, {artist:{$regex: filter}}] */
-  /* else */ if (lang) query.languages = lang
-  // else if (filter) query.$or = [{ title: { $regex: reg, $options: 'i' } }, { tags: { $regex: reg, $options: 'i' } }, { artist: { $regex: reg, $options: 'i' } }]
-  // else if (filter) query.$or = [{title: {$regex: filter}}, {tags: {$regex: filter}}, {artist: {$regex: filter}}]
-  // else if (filter) query.$or = [{ title: { $in: filterArr } }, { tags: { $in: filterArr } }, { artist: { $in: filterArr } }] * /
-  // else if (filter) query.$or = [{ title: filter }, { tags: filter }, { artist: filter }]
+  if (filter && lang) query.$and = [{languages: lang}, {$text: {$search : filter}}]
+  else if (lang) query.languages = lang
   else if (filter) query = {$text: {$search : filter}}  // need to create index which is in video schema
-
-  /* else if (filter) {
-    query.$or = []
-    query.$or[0] = {title: {$in: filterArr}}
-    query.$or[1] = {tags: {$in: filterArr}}
-    query.$or[1] = {artist: {$in: filterArr}}
-  } */
-
-  console.log(query)
   Video.find(query)
     .populate("uploader_id", "_id user_name")
     .then((videos) => res.json(videos))
     .catch((err) => res.json(err));
 });
-/* {languages: { $elemMatch : {$in: lang}}}  /// {languages: "de"} */
 
 // get all videos of a specific uploader
 videoRouter.get(

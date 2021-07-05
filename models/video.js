@@ -12,7 +12,7 @@ const VideoSchema = new Schema( {
     },
     artist: {
         type : String, 
-        required : true,
+        required : true, 
         index: true
     },
     video_url: {
@@ -48,10 +48,10 @@ const VideoSchema = new Schema( {
         ref: 'User' 
     }],
     languages: [String],
-    tags: [{
+    tags: {
         type: String,
         index: true
-    }]
+    }
 })
 
 // VideoSchema.index({title: "text", artist: "text", tags: "text"})  // need for search query in videoRouter get method
