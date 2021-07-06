@@ -8,7 +8,7 @@ const cookieParser = require("cookie-parser");
 authRouter.use(cookieParser());
 
 const generateAccessToken = (user) => {
-  return jwt.sign(user, process.env.SECRET/* , { expiresIn: "20mins" } */); // "20mins"
+  return jwt.sign(user, process.env.SECRET /* , { expiresIn: "20mins" } */); // "20mins"
 };
 const generateRefreshToken = (user) => {
   return jwt.sign(user, process.env.REFRESH_SECRET, { expiresIn: "72hours" });
@@ -33,14 +33,10 @@ authRouter.post("/refresh", (req, res) => {
 // logout deleting access (on frontend) and refresh token (here)
 authRouter.get("/logout", (req, res) => {
   /* cookies.set('refresh_token', { expires: Date.now() }); */
-<<<<<<< HEAD
-  res.clearCookie("refresh_token").status(204).send("Logout successful");
-=======
   res
     /* .clearCookie("refresh_token") */
     .status(204)
     .send("Logout successful");
->>>>>>> main
 });
 
 // register a new user

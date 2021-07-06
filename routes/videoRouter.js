@@ -7,16 +7,35 @@ const videoRouter = Router();
 
 // get all videos
 videoRouter.get("/videos", (req, res) => {
-  const { lang, filter } = req.query
-  let query = {}
-  if (filter && lang) query.$and = [{ languages: lang }, { $text: { $search: filter } }]
-  else if (lang) query.languages = lang
-  else if (filter) query = { $text: { $search: filter } }  // need to create index which is in video schema
-  Video.find(query)
-    .lean()
-    .populate("uploader_id", "_id user_name")
-    .then((videos) => res.json(videos))
-    .catch((err) => res.json(err));
+  const { lang, filter } = req.query;
+  let query = {};
+  if (filter && lang)
+    query.$and = [{ languages: lang }, { $text: { $search: filter } }];
+  else if (lang) query.languages = lang;
+  else if (filter) query = { $text: { $search: filter } }; // need to create index which is in video schema
+  console.log(filter || lang);
+  /* console.log(query); */
+  if (filter || lang) {
+    Video.find(query)
+      .lean()
+      .populate("uploader_id", "_id user_name")
+      .then((videos) => res.json(videos))
+      .catch((err) => res.json(err));
+  } else {
+    Video.estimatedDocumentCount().then((count) => {
+      //Random number between 0 and count.
+      console.log(count);
+      const rand = Math.floor((Math.random() * count) / 24);
+      console.log(rand);
+      Video.find(query)
+        .skip(rand)
+        .limit(24)
+        .lean()
+        .populate("uploader_id", "_id user_name")
+        .then((videos) => res.json(videos))
+        .catch((err) => res.json(err));
+    });
+  }
 });
 
 // get all videos of a specific uploader
@@ -79,12 +98,11 @@ videoRouter.put("/videos/:video_id/unreport", verifyUser, async (req, res) => {
   if (!video.reportedBy.includes(user_id))
     return res.status(409).send("Video has never been reported by this user.");
   video.reports--;
-  video.reportedBy.splice(video.reportedBy.indexOf(user_id), 1)
+  video.reportedBy.splice(video.reportedBy.indexOf(user_id), 1);
   Video.findOneAndUpdate({ _id: video_id }, video, { new: true })
     .then((video) => res.json(video))
     .catch((err) => res.json(err));
 });
-
 
 // get all videos of one uploader
 videoRouter.get("/users/:user_id/videos", verifySpecificUser, (req, res) => {
