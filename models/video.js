@@ -7,11 +7,13 @@ delete mongoose.connection.models['Video'];
 const VideoSchema = new Schema( {
     title: {
         type : String, 
-        required : true
+        required : true,
+        index: true
     },
     artist: {
         type : String, 
-        required : true
+        required : true, 
+        index: true
     },
     video_url: {
         type : String, 
@@ -46,8 +48,13 @@ const VideoSchema = new Schema( {
         ref: 'User' 
     }],
     languages: [String],
-    tags: [String]
+    tags: {
+        type: String,
+        index: true
+    }
 })
+
+// VideoSchema.index({title: "text", artist: "text", tags: "text"})  // need for search query in videoRouter get method
 
 VideoSchema.plugin(uniqueValidator);
 

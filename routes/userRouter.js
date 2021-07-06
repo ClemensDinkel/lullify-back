@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 // get all users
 userRouter.get("/users", verifyAdmin, (req, res) => {
   User.find()
+    .lean()
     .populate("favorites", "artist title video_url")
     .populate({
       path: "playlists",
@@ -21,6 +22,7 @@ userRouter.get("/users", verifyAdmin, (req, res) => {
 userRouter.get("/users/:user_id", verifySpecificUser, (req, res) => {
   const { user_id } = req.params;
   User.find({ _id: user_id })
+    .lean()
     .populate("favorites", "artist title video_url")
     .populate({
       path: "playlists",
@@ -46,7 +48,7 @@ userRouter.put("/users/:user_id", verifySpecificUser, async (req, res) => {
     user.password = hashPassword;
   } else user.password = dbpw;
   // maybe there is a better way without making a second call
-  User.findOneAndUpdate({ _id: user_id }, user)
+  User.findOneAndUpdate({ _id: user_id }, user, { new: true })
     .then((user) => res.json(user))
     .catch((err) => res.json(err));
 });
@@ -64,12 +66,12 @@ userRouter.put(
     await User.findOne({ _id: user_id })
       .exec()
       .then((res) => (user = res));
-    console.log(user);
     if (user.favorites.includes(video_id))
-      return res.status(409).send("Video already exist.");
+      return res.status(409).send("Video already a favorite.");
     user.favorites.push(video_id);
-    User.findOneAndUpdate({ _id: user_id }, user)
-      .then((res) => res.json(user))
+    User.findOneAndUpdate({ _id: user_id }, user, { new: true })
+      .populate("favorites", "artist title video_url")
+      .then((user) => res.json(user.favorites))
       .catch((err) => res.json(err));
   }
 );
@@ -86,12 +88,12 @@ userRouter.put(
     await User.findOne({ _id: user_id })
       .exec()
       .then((res) => (user = res));
-    console.log(user);
     if (!user.favorites.includes(video_id))
-      return res.status(409).send("Video doesn't exist.");
+      return res.status(409).send("Video isn't a favorite.");
     user.favorites.splice(user.favorites.indexOf(video_id), 1);
-    User.findOneAndUpdate({ _id: user_id }, user)
-      .then((res) => res.json(user))
+    User.findOneAndUpdate({ _id: user_id }, user, { new: true })
+      .populate("favorites", "artist title video_url")
+      .then((user) => res.json(user.favorites))
       .catch((err) => res.json(err));
   }
 );
