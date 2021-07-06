@@ -33,10 +33,7 @@ authRouter.post("/refresh", (req, res) => {
 // logout deleting access (on frontend) and refresh token (here)
 authRouter.get("/logout", (req, res) => {
   /* cookies.set('refresh_token', { expires: Date.now() }); */
-  res
-    .clearCookie("refresh_token")
-    .status(204)
-    .send("Logout successful");
+  res.clearCookie("refresh_token").status(204).send("Logout successful");
 });
 
 // register a new user
