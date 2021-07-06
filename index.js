@@ -8,6 +8,7 @@ const videoRouter = require("./routes/videoRouter");
 const playlistRouter = require("./routes/playlistRouter");
 const authRouter = require("./routes/authRouter");
 const requestRouter = require("./routes/requestRouter");
+const YPApiRouter = require("./routes/YTApiRouter")
 const cors = require("cors");
 const corsOptions = {
   origin: "*", //["http://localhost:3000","https://thirsty-jang-8e90b8.netlify.app/"],
@@ -45,5 +46,6 @@ app.use(videoRouter);
 app.use(playlistRouter);
 app.use(authRouter);
 app.use(requestRouter);
+app.use(YPApiRouter)
 
 app.listen(PORT, console.log(`Running on ${PORT}`));
