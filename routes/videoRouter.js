@@ -17,6 +17,7 @@ videoRouter.get("/videos", (req, res) => {
   /* console.log(query); */
   if (filter || lang) {
     Video.find(query)
+      .limit(24)
       .lean()
       .populate("uploader_id", "_id user_name")
       .then((videos) => res.json(videos))
@@ -29,7 +30,7 @@ videoRouter.get("/videos", (req, res) => {
       console.log(rand);
       Video.find(query)
         /* .skip(rand) */
-        .limit(24) 
+        .limit(24)
         .lean()
         .populate("uploader_id", "_id user_name")
         .then((videos) => res.json(videos))
