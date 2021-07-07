@@ -3,7 +3,7 @@ const YTApiRouter = Router();
 const verifyCC = require("./verifyCC");
 const fetch = require("node-fetch");
 
-// get all requests
+// fetch video data from Youtube api for autofill of form on frontend
 YTApiRouter.get('/ytapi', verifyCC, async (req, res) => {
     try {
         const searchString = req.query.q;

@@ -28,8 +28,8 @@ videoRouter.get("/videos", (req, res) => {
       const rand = Math.floor((Math.random() * count) / 24);
       console.log(rand);
       Video.find(query)
-        /* .skip(rand)
-        .limit(24) */
+        /* .skip(rand) */
+        .limit(24) 
         .lean()
         .populate("uploader_id", "_id user_name")
         .then((videos) => res.json(videos))
