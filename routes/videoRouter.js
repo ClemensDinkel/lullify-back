@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const { Video } = require("../models/video");
+const { User } = require("../models/user");
 const verifyCC = require("./verifyCC");
 const verifySpecificUser = require("./verifySpecificUser");
 const verifyUser = require("./verifyUser");
@@ -21,17 +22,39 @@ videoRouter.get("/videos", (req, res) => {
       .then((videos) => res.json(videos))
       .catch((err) => res.json(err));
   } else {
-    Video.estimatedDocumentCount().then((count) => {
-      //Random number between 0 and count.
-      // const rand = Math.floor((Math.random() * count) / 24);
-      Video.find(query)
-        /*  .skip(rand)
-        .limit(24) */
-        .lean()
-        .populate("uploader_id", "_id user_name")
-        .then((videos) => res.json(videos))
-        .catch((err) => res.json(err));
-    });
+    //Random number between 0 and count.
+    // const rand = Math.floor((Math.random() * count) / 24);
+    Video.aggregate([
+      {"$sample": { 
+        size: 24, 
+      }},
+      {"$lookup": {
+        "from": User.collection.name,
+        "localField": "uploader_id",
+        "foreignField": "_id",
+        "as": "uploader_id"
+      }},
+      {"$unwind": "$uploader_id"}
+    ])
+    .then(videos => res.json(videos))
+    .catch(err => res.json(err))
+    // Video.find(query)
+    /*.skip(rand)
+    .limit(24) 
+     .lean() 
+     */
+    /* .populate("uploader_id", "_id user_name") */
+    /* .then((videos) => {
+      Video.populate(videos, {
+        path: "uploader_id", model: User
+      })
+      .then(popvideos => {
+        res.json(popvideos)
+      })
+       res.json(videos) 
+      .catch(err => res.json(err))
+    })
+    .catch(err => res.json(err)) */
   }
 });
 
