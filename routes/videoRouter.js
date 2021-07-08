@@ -13,11 +13,9 @@ videoRouter.get("/videos", (req, res) => {
     query.$and = [{ languages: lang }, { $text: { $search: filter } }];
   else if (lang) query.languages = lang;
   else if (filter) query = { $text: { $search: filter } }; // need to create index which is in video schema
-  console.log(filter || lang);
-  /* console.log(query); */
   if (filter || lang) {
     Video.find(query)
-      .limit(24)
+      /* .limit(24) */
       .lean()
       .populate("uploader_id", "_id user_name")
       .then((videos) => res.json(videos))
@@ -25,12 +23,10 @@ videoRouter.get("/videos", (req, res) => {
   } else {
     Video.estimatedDocumentCount().then((count) => {
       //Random number between 0 and count.
-      console.log(count);
-      const rand = Math.floor((Math.random() * count) / 24);
-      console.log(rand);
+      // const rand = Math.floor((Math.random() * count) / 24);
       Video.find(query)
-        /* .skip(rand) */
-        .limit(24)
+        /*  .skip(rand)
+        .limit(24) */
         .lean()
         .populate("uploader_id", "_id user_name")
         .then((videos) => res.json(videos))
