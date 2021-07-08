@@ -7,7 +7,7 @@ const verifyUser = require("./verifyUser");
 const videoRouter = Router();
 
 // get 24 videos (home)
-videoRouter.get("/videos", (req, res) => {
+videoRouter.get("/videos/collection", (req, res) => {
   const { lang, filter } = req.query;
   let query = {};
   if (filter && lang)
@@ -61,27 +61,19 @@ videoRouter.get("/videos", (req, res) => {
   }
 });
 
-// get all videos (admin)
-videoRouter.get("/adminvideos", (req, res) => {
+// get all videos (adminpanel)
+videoRouter.get("/videos", (req, res) => {
   const { lang, filter } = req.query;
   let query = {};
   if (filter && lang)
     query.$and = [{ languages: lang }, { $text: { $search: filter } }];
   else if (lang) query.languages = lang;
   else if (filter) query = { $text: { $search: filter } }; // need to create index which is in video schema
-  if (filter || lang) {
-    Video.find(query)
-      .lean()
-      .populate("uploader_id", "_id user_name")
-      .then((videos) => res.json(videos))
-      .catch((err) => res.json(err));
-  } else {
-    Video.find()
-      .lean()
-      .populate("uploader_id", "_id user_name")
-      .then((videos) => res.json(videos))
-      .catch((err) => res.json(err));
-  } // we might be able to get rid of is else here
+  Video.find(query)
+    .lean()
+    .populate("uploader_id", "_id user_name")
+    .then((videos) => res.json(videos))
+    .catch((err) => res.json(err));
 });
 
 // get all videos of a specific uploader
