@@ -6,7 +6,7 @@ const verifySpecificUser = require("./verifySpecificUser");
 const verifyUser = require("./verifyUser");
 const videoRouter = Router();
 
-// get all videos
+// get 24 videos (home)
 videoRouter.get("/videos", (req, res) => {
   const { lang, filter } = req.query;
   let query = {};
@@ -16,46 +16,72 @@ videoRouter.get("/videos", (req, res) => {
   else if (filter) query = { $text: { $search: filter } }; // need to create index which is in video schema
   if (filter || lang) {
     Video.find(query)
-      /* .limit(24) */
+      .limit(24)
       .lean()
       .populate("uploader_id", "_id user_name")
       .then((videos) => res.json(videos))
       .catch((err) => res.json(err));
   } else {
-    //Random number between 0 and count.
-    // const rand = Math.floor((Math.random() * count) / 24);
     Video.aggregate([
-      {"$sample": { 
-        size: 24, 
-      }},
-      {"$lookup": {
-        "from": User.collection.name,
-        "localField": "uploader_id",
-        "foreignField": "_id",
-        "as": "uploader_id"
-      }},
-      {"$unwind": "$uploader_id"}
+      {
+        "$sample": {
+          size: 24,
+        }
+      },
+      {
+        "$lookup": {
+          "from": User.collection.name,
+          "localField": "uploader_id",
+          "foreignField": "_id",
+          "as": "uploader_id"
+        }
+      },
+      { "$unwind": "$uploader_id" },
+      {
+        "$project": {
+          "uploader_id.email": false,
+          "uploader_id.first_name": false,
+          "uploader_id.last_name": false,
+          "uploader_id.user_img_url": false,
+          "uploader_id.role": false,
+          "uploader_id.reg_date": false,
+          "uploader_id.phone": false,
+          "uploader_id.city_name": false,
+          "uploader_id.city_code": false,
+          "uploader_id.favorites": false,
+          "uploader_id.street": false,
+          "uploader_id.password": false,
+          "uploader_id.company": false,
+          "uploader_id.country": false,
+        }
+      }
     ])
-    .then(videos => res.json(videos))
-    .catch(err => res.json(err))
-    // Video.find(query)
-    /*.skip(rand)
-    .limit(24) 
-     .lean() 
-     */
-    /* .populate("uploader_id", "_id user_name") */
-    /* .then((videos) => {
-      Video.populate(videos, {
-        path: "uploader_id", model: User
-      })
-      .then(popvideos => {
-        res.json(popvideos)
-      })
-       res.json(videos) 
+      .then(videos => res.json(videos))
       .catch(err => res.json(err))
-    })
-    .catch(err => res.json(err)) */
   }
+});
+
+// get all videos (admin)
+videoRouter.get("/adminvideos", (req, res) => {
+  const { lang, filter } = req.query;
+  let query = {};
+  if (filter && lang)
+    query.$and = [{ languages: lang }, { $text: { $search: filter } }];
+  else if (lang) query.languages = lang;
+  else if (filter) query = { $text: { $search: filter } }; // need to create index which is in video schema
+  if (filter || lang) {
+    Video.find(query)
+      .lean()
+      .populate("uploader_id", "_id user_name")
+      .then((videos) => res.json(videos))
+      .catch((err) => res.json(err));
+  } else {
+    Video.find()
+      .lean()
+      .populate("uploader_id", "_id user_name")
+      .then((videos) => res.json(videos))
+      .catch((err) => res.json(err));
+  } // we might be able to get rid of is else here
 });
 
 // get all videos of a specific uploader
